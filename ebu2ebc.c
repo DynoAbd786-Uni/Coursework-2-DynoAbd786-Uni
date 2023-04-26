@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     
     // output to ebc file
-    errCode = outputFileDataEbuDirectEbc(inputData, outputFilename, outputFile);
+    errCode = outputFileDataEbuDirectEbc(inputData, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {

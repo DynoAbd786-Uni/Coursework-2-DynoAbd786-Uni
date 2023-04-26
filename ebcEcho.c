@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     
     // output to file
-    errCode = outputFileDataCompressedBinary(inputData, outputFilename, outputFile);
+    errCode = outputFileDataCompressedBinary(inputData, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {

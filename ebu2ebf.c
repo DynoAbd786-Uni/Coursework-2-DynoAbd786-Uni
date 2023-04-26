@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     } // validate output file
 
     // output to ebf file
-    errCode = outputFileDataEbuDirectEbf(inputData, outputFilename, outputFile);
+    errCode = outputFileDataEbuDirectEbf(inputData, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {

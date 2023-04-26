@@ -424,6 +424,7 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
         data->numBytesCompressed = ((data->numBytesUncompressed) * (COMPRESSION_FACTOR));
     }
 
+
     // uncompressed data block malloc'd
     // 2D imageData not needed since the program can just write the whole block in 1 go
     data->dataBlockUncompressed = (BYTE *) malloc(data->numBytesUncompressed * sizeof(BYTE));

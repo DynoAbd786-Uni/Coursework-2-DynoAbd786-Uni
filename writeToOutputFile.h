@@ -6,41 +6,41 @@ int outputHeader(unsigned char *magicNumber, int height, int width, FILE *output
 
 
 // for ebf to ebf outputs
-int outputFileData(ebfData *data, char *filename, FILE *outputFile);
+int outputFileData(ebfData *data, FILE *outputFile);
 
 int outputImageData(unsigned int **imageData, int height, int width, FILE *outputFile);
 
 
 // for ebf to ebu outputs
-int outputFileDataEbfDirectEbu(ebfData *data, char *filename, FILE *outputFile);
+int outputFileDataEbfDirectEbu(ebfData *data, FILE *outputFile);
 
 int outputImageDataEbfDirectEbu(unsigned int **imageData, int height, int width, FILE *outputFile);
 
 
 // for ebu to ebf outputs
-int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile);
+int outputFileDataEbuDirectEbf(ebuData *data, FILE *outputFile);
 
 int outputImageDataEbuDirectEbf(BYTE **imageData, int height, int width, FILE *outputFile);
 
 
 // for ebu to ebu outputs
-int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile);
+int outputFileDataBinary(ebuData *data, FILE *outputFile);
 
 int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile);
 
 
 // for ebu to ebc outputs
-int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
+int outputFileDataEbuDirectEbc(ebuData *data, FILE *outputFile);
 
-int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
+int outputImageDataEbuDirectEbc(ebuData *data, FILE *outputFile);
 
 
 // for ebc to ebc outputs
-int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFile);
+int outputFileDataCompressedBinary(ebcData *data, FILE *outputFile);
 
 
 // for ebc to ebu outputs
-int outputFileDataEbcDirectEbu(ebcData *data, char *filename, FILE *outputFile);
+int outputFileDataEbcDirectEbu(ebcData *data, FILE *outputFile);
 
 
 

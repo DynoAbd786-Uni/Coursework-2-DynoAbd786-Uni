@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     } // validate output file
 
     // output to file
-    errCode = outputFileData(inputData, outputFilename, outputFile);
+    errCode = outputFileData(inputData, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {

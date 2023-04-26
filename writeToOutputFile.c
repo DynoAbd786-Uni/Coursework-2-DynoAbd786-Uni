@@ -11,7 +11,7 @@
 
 // executes a series of functions to write to a file
 // returns respective error codes if output has failed, otherwise 0 is successful
-int outputFileData(ebfData *data, char *filename, FILE *outputFile)
+int outputFileData(ebfData *data, FILE *outputFile)
 {
     // output header to file and validate for success (0 means success)
     if (outputHeader(data->magicNumber, data->height, data->width, outputFile) != 0)
@@ -85,7 +85,7 @@ int outputImageData(unsigned int **imageData, int height, int width, FILE *outpu
 
 // function takes all data for ebf file and outputs it to ebu file
 // returns respective error codes if failed, 0 if otherwise
-int outputFileDataEbfDirectEbu(ebfData *data, char *filename, FILE *outputFile)
+int outputFileDataEbfDirectEbu(ebfData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
     unsigned char *header = (unsigned char *) "eu";
@@ -128,7 +128,7 @@ int outputImageDataEbfDirectEbu(unsigned int **imageData, int height, int width,
 
 // writes all pixel values from ebu binary format to the ebf output file in readable format
 // returns error code if output has failed, 0 if successful
-int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile)
+int outputFileDataEbuDirectEbf(ebuData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
     unsigned char *header = (unsigned char *) "eb";
@@ -193,7 +193,7 @@ int outputImageDataEbuDirectEbf(BYTE **imageData, int height, int width, FILE *o
 
 // outputs all data to a file, where the pixel values are in binary
 // returns error code if output has failed, 0 if successful
-int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile)
+int outputFileDataBinary(ebuData *data, FILE *outputFile)
 {
     // output header to file and validate for success (0 means success)
     if (outputHeader(data->magicNumber, data->height, data->width, outputFile) != 0)
@@ -225,7 +225,7 @@ int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile)
 
 // function takes all data for ebu file and outputs it to ebc file
 // returns respective error codes if failed, 0 if otherwise
-int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
+int outputFileDataEbuDirectEbc(ebuData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
     unsigned char *header = (unsigned char *) "ec";
@@ -235,7 +235,7 @@ int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
         return BAD_OUTPUT;
     }
     // output image data to file and validate for success (0 means success)
-    int errCode = outputImageDataEbuDirectEbc(data, filename, outputFile);
+    int errCode = outputImageDataEbuDirectEbc(data, outputFile);
     if (errCode != 0)
     {
         return errCode;
@@ -246,7 +246,7 @@ int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
 
 // outputs image data from binary format to compressed binary format
 // returns error code if output has failed, 0 if successful
-int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
+int outputImageDataEbuDirectEbc(ebuData *data, FILE *outputFile)
 {
     // calculate size and allocate memory for an array that will store the compressed binary format once converted
     int sizeOfCompressedBinaryArray;
@@ -286,7 +286,7 @@ int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
 
 // outputs all data to a file, where the pixel values are in compressed binary
 // returns error code if output has failed, 0 if successful
-int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFile)
+int outputFileDataCompressedBinary(ebcData *data, FILE *outputFile)
 {
     // output header to file and validate for success (0 means success)
     if (outputHeader(data->magicNumber, data->height, data->width, outputFile) != 0)
@@ -306,7 +306,7 @@ int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFi
 
 // function takes all data for ebc file and outputs it to ebu file
 // returns respective error codes if failed, 0 if otherwise
-int outputFileDataEbcDirectEbu(ebcData *data, char *filename, FILE *outputFile)
+int outputFileDataEbcDirectEbu(ebcData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
     unsigned char *header = (unsigned char *) "eu";
