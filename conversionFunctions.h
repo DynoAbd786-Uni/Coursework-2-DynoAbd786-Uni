@@ -11,5 +11,5 @@ unsigned int convertEbu2Ebf(BYTE pixelValueBinary);
 
 BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytes);
 
-long convertEbc2Ebu(ebcData *data);
+long convertEbc2Ebu(BYTE *compressedPixelValues, BYTE *uncompressedBinaryArray, int numBytesCompressed, int numBytesUncompressed);
 

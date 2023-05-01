@@ -18,7 +18,7 @@ unsigned int convertEbu2Ebf(BYTE pixelValueBinary)
 }
 
 // function converts an array of uncompressed binary pixels to compressed binary format 
-BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytes)
+BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytesUncompressed)
 {    
     // variables for storing and tracking compressed binary information
     BYTE storageByte = 0;
@@ -26,7 +26,7 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
     long compressedBinaryArrayPostitionTracker = 0;
 
     // for every byte stored inside the uncompressed byte array
-    for (int byteNumber = 0; byteNumber < numBytes; byteNumber++)
+    for (int byteNumber = 0; byteNumber < numBytesUncompressed; byteNumber++)
     {
         // for the first 5 bits inside the selected byte, starting at byte 5
         for (int bitNumber = MAX_BITS_IN_UNCOMPRESSED_BYTE; bitNumber > 0; bitNumber--)
@@ -64,7 +64,7 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
 // function converts an array of compressed binary pixels to uncompressed binary format
 // works within the data struct since arrays for both compressed and uncompressed binary arrays have been defined
 // reason for this: need to check for amount of pixels, so only way to do that is to decompress image data
-long convertEbc2Ebu(ebcData *data)
+long convertEbc2Ebu(BYTE *compressedPixelValues, BYTE *uncompressedBinaryArray, int numBytesCompressed, int numBytesUncompressed)
 {
     // variables for storing and tracking compressed binary information
     BYTE storageByte = 0;
@@ -72,13 +72,13 @@ long convertEbc2Ebu(ebcData *data)
     int uncompressedBitPostitionTracker = 0;
 
     // for every compressed byte inside the compressed array
-    for (int byteNumber = 0; byteNumber < data->numBytesCompressed; byteNumber++)
+    for (int byteNumber = 0; byteNumber < numBytesCompressed; byteNumber++)
     {
         // for every bit inside every byte
         for (int bitNumber = MAX_BITS_IN_BYTE; bitNumber > 0; bitNumber--)
         {
             // grab the bit at the position bitNumber
-            int bitAtBitNumber = (data->dataBlockCompressed[byteNumber] >> (bitNumber - 1)) & 0x01;
+            int bitAtBitNumber = (compressedPixelValues[byteNumber] >> (bitNumber - 1)) & 0x01;
             // write the bit to the storage byte and overwrite it with the bits shifted left by 1
             storageByte = (storageByte << 1) | bitAtBitNumber;
             // increment to keep track of how much the byte has been filled by
@@ -89,10 +89,10 @@ long convertEbc2Ebu(ebcData *data)
             {
                 // accounting for the problem where if the algorithm reaches the end of the array, NULL chars may be picked up
                 // this happens when the compressed array has numBytesCompressed that isnt divisible by the COMPRESSION_FACTOR
-                if (!(storageByte == 0 && uncompressedBinaryArrayPostitionTracker >= data->numBytesUncompressed))
+                if (!(storageByte == 0 && uncompressedBinaryArrayPostitionTracker >= numBytesUncompressed))
                 {
                     // write the storageByte to the uncompressed array and increment the array to the next position
-                    data->dataBlockUncompressed[uncompressedBinaryArrayPostitionTracker] = storageByte;
+                    uncompressedBinaryArray[uncompressedBinaryArrayPostitionTracker] = storageByte;
                     uncompressedBinaryArrayPostitionTracker++;
                 }
 

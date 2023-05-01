@@ -39,4 +39,19 @@ typedef struct
 ebcData;
 
 
+// struct for storing data from an ebcc file
+typedef struct
+{
+    unsigned char magicNumber[2];
+    int width, height;
+    long numBlocksUncompressed;
+    long numBlocksCompressed;
+    BYTE *blocksCompressed;
+    BYTE *blocksUncompressed;
+    BYTE **imageDataUncompressed;
+    BYTE *dataBlockUncompressed;
+}
+ebcBlockData;
+
+
 

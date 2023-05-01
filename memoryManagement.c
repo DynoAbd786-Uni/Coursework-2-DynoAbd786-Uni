@@ -134,7 +134,7 @@ void freeEbuDataArray(ebuData *dataToCompare[])
 
 /*      EBC DATA MEMORY RELATED FUNCTIONS      */
 
-// mallocs an uninitialised struct of type ebuData to store file information to
+// mallocs an uninitialised struct of type ebcData to store file information to
 // returns the data struct
 ebcData *mallocEbc()
 {
@@ -185,4 +185,57 @@ void freeEbcDataArray(ebcData *dataToCompare[])
 }
 
 
+/*      EBC BLOCK DATA MEMORY RELATED FUNCTIONS     */
+
+// mallocs an uninitialised struct of type ebcBlockData to store file information to
+// returns the data struct
+ebcBlockData *mallocEbcBlock()
+{
+    ebcBlockData *data = (ebcBlockData *) malloc(sizeof(ebcBlockData));
+    return data;
+}
+
+// frees 1 data entry from the type ebcBlockData
+void freeEbcBlockData(ebcBlockData *data)
+{
+    // checks if blocksCompressed has been malloc'd
+    if (data->blocksCompressed != NULL)
+    {
+        // free and dereference dataBlock to NULL to avoid hanging pointer
+        free(data->blocksCompressed);
+        data->blocksCompressed = NULL;
+    }
+
+    // checks if blocksUncompressed has been malloc'd
+    if (data->blocksUncompressed != NULL)
+    {
+        // free and dereference dataBlock to NULL to avoid hanging pointer
+        free(data->blocksUncompressed);
+        data->blocksUncompressed = NULL;
+    }
+
+    // checks if imageDataUncompressed has been malloc'd
+    if (data->imageDataUncompressed != NULL)
+    {
+        // free and dereference imageDataUncompressed to NULL to avoid hanging pointer
+        free(data->imageDataUncompressed);
+        data->imageDataUncompressed = NULL;
+    }
+
+    // checks if dataBlockUncompressed has been malloc'd
+    if (data->dataBlockUncompressed != NULL)
+    {
+        // free and dereference dataBlockUncompressed to NULL to avoid hanging pointer
+        free(data->dataBlockUncompressed);
+        data->dataBlockUncompressed = NULL;
+    }
+
+    // checks if data struct has been malloc'd
+    if (data != NULL)
+    {
+        // free and dereference data struct to NULL to avoid hanging pointer
+        free(data);
+        data = NULL;
+    }
+}
 

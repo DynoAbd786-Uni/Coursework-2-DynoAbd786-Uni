@@ -30,3 +30,10 @@ ebcData *mallocEbc();
 void freeEbcData(ebcData *data);
 
 void freeEbcDataArray(ebcData *dataToCompare[]);
+
+
+/*      EBCC RELATED FUNCTIONS       */
+
+ebcBlockData *mallocEbcBlock();
+
+void freeEbcBlockData(ebcBlockData *data);

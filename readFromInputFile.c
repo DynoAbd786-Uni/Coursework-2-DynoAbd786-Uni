@@ -463,7 +463,7 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
     // not possible in this case to check pixel values, since compressed size has only 2^5 bits
     // therefore has guaranteed range of 0 to 31
     // check if number of decompressed bytes matches the assigned numBytesUncompressed
-    if (badNumBytes(convertEbc2Ebu(data), data->numBytesUncompressed, filename))
+    if (badNumBytes(convertEbc2Ebu(data->dataBlockCompressed, data->dataBlockUncompressed, data->numBytesCompressed, data->numBytesUncompressed), data->numBytesUncompressed, filename))
     {
         return BAD_DATA;
     } 
