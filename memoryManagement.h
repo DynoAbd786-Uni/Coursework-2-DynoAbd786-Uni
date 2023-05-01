@@ -37,3 +37,5 @@ void freeEbcDataArray(ebcData *dataToCompare[]);
 ebcBlockData *mallocEbcBlock();
 
 void freeEbcBlockData(ebcBlockData *data);
+
+void copyEbcDataToEbcBlockData(ebcData *inputData, ebcBlockData *outputData);

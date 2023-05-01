@@ -483,3 +483,96 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
 }
 
 
+
+/*      FOR EBCC FILES      */
+
+// mallocs and sets up data arrays in ebcBlockData
+int setEbcBlockData(ebcBlockData *data)
+{
+    // set up imageData 2D array
+    // caclulate total size and allocate memory for array
+    data->numBytes = data->height * data->width;
+    data->imageDataUncompressed = (BYTE **) malloc(data->numBytes * sizeof(BYTE *));
+
+    // if malloc is unsuccessful, it will return a BAD MALLOC error code
+    if (badMalloc(data->imageDataUncompressed))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // checks whether the data in dataBlockUncompressed alrady exists. if not, malloc new data
+    if (data->dataBlockUncompressed == NULL)
+    {
+        // data block malloc'd to set up 2D array for imageDataUncompressed
+        data->dataBlockUncompressed = (BYTE *) malloc(data->numBytes * sizeof(BYTE));
+
+        // if malloc is unsuccessful, it will return a null pointer
+        if (badMalloc(data->dataBlockUncompressed))
+        { // check malloc
+            return BAD_MALLOC;
+        } // check malloc
+    }
+
+    // pointer arithmetic to set up 2D array 
+    for (int row = 0; row < data->height; row++)
+    {
+        data->imageDataUncompressed[row] = data->dataBlockUncompressed + row * data->width;
+    }
+    return 0;
+
+
+    // set up blocksUncompressed array
+    // finding number of blocks across the width of the image
+    data->noBlocksByWidth = data->width / 3;
+
+    // adding an extra block if the width is not divisible
+    if (data->width % 3 != 0)
+    {
+        data->noBlocksByWidth++;
+    }
+
+    // finding number of blocks across the height of the image
+    data->noBlocksByHeight = data->height / 3;
+
+    // adding an extra block if the height is not divisible
+    if (data->height % 3 != 0)
+    {
+        data->noBlocksByHeight++;
+    }
+
+    // calculating total number of blocks for image
+    data->numBlocksUncompressed = data->noBlocksByHeight * data->noBlocksByWidth;
+
+    // malloc data for blocksUncompressed 
+    data->blocksUncompressed = (BYTE *) malloc(data->numBlocksUncompressed * sizeof(BYTE));
+
+    // if malloc is unsuccessful, it will return a null pointer
+    if (badMalloc(data->blocksUncompressed))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // set up blocksCompressed array
+    // calculates numBlocksCompressed 
+    // extra bit of logic to account for any overhead in the file
+    // if there is a remainder from numBlocksUncompressed, there is an extra byte that is storing information that needs to be collected
+    if (fmod(data->numBlocksUncompressed, COMPRESSION_FACTOR) != 0.0)
+    {
+        data->numBlocksCompressed = ((data->numBlocksUncompressed) * (COMPRESSION_FACTOR)) + 1;
+    }
+    else
+    {
+        data->numBlocksCompressed = ((data->numBlocksUncompressed) * (COMPRESSION_FACTOR));
+    }
+
+    // malloc data for blocksCompressed 
+    data->blocksCompressed = (BYTE *) malloc(data->numBlocksCompressed * sizeof(BYTE));
+
+    // if malloc is unsuccessful, it will return a null pointer
+    if (badMalloc(data->blocksCompressed))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+}
+
+

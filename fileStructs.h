@@ -44,8 +44,10 @@ typedef struct
 {
     unsigned char magicNumber[2];
     int width, height;
-    long numBlocksUncompressed;
-    long numBlocksCompressed;
+    int noBlocksByWidth, noBlocksByHeight;
+    long numBytes;
+    long numBlocksUncompressed;         // variables for finding how many bytes 
+    long numBlocksCompressed;           // are needed for these arrays
     BYTE *blocksCompressed;
     BYTE *blocksUncompressed;
     BYTE **imageDataUncompressed;

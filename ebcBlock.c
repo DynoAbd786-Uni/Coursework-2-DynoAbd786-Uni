@@ -6,6 +6,7 @@
 #include "loadFiles.h"
 #include "readFromInputFile.h"
 #include "writeToOutputFile.h"
+#include "blockHandling.h"
 
 
 int main(int argc, char **argv)
@@ -70,18 +71,30 @@ int main(int argc, char **argv)
         return BAD_MALLOC;
     }
 
-    // check if number of decompressed bytes matches the assigned numBytesUncompressed
-    if (badNumBytes(convertEbc2Ebu(data->dataBlockCompressed, data->dataBlockUncompressed, data->numBytesCompressed, data->numBytesUncompressed), data->numBytesUncompressed, filename))
+    // copy over data from ebcData struct to ebcBlockData struct for easier data handling
+    copyEbcDataToEbcBlockData(inputData, outputData);
+
+    // set up the rest of ebcBlockData
+    // checks for any error codes that may have been returned
+    check = setEbcBlockData(outputData);
+    if (check != 0)
     {
-        return BAD_DATA;
+        return check;
     }
+
+    calculateBlockData(outputData);
+
     
 
 
 
 
-    // convert to ebu data struct to handle block calculations
-    // get blocks and store in 1D array (ebcBlock)
+    
+    
+
+
+
+
     // compress blocks
     // output block file data
 

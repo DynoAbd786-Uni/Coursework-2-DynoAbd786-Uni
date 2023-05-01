@@ -239,3 +239,14 @@ void freeEbcBlockData(ebcBlockData *data)
     }
 }
 
+// copies over data from ebcData to ebcBlockData for easier data handling
+void copyEbcDataToEbcBlockData(ebcData *inputData, ebcBlockData *outputData)
+{
+    // copying dimensions
+    outputData->width = inputData->width;
+    outputData->height = inputData->height;
+
+    // copying uncompressedImageData
+    outputData->dataBlockUncompressed = inputData->dataBlockUncompressed;    
+}
+

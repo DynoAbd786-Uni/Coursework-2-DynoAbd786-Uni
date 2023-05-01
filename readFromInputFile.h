@@ -34,3 +34,8 @@ int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputF
 int setCompressedBinaryImageDataArrayEbc(ebcData *data);
 
 int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *filename);
+
+
+/*      FOR EBCC FILES      */
+
+int setEbcBlockData(ebcBlockData *data);
