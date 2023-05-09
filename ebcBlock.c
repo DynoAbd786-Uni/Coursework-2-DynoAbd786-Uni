@@ -7,6 +7,7 @@
 #include "readFromInputFile.h"
 #include "writeToOutputFile.h"
 #include "blockHandling.h"
+#include "conversionFunctions.h"
 
 
 int main(int argc, char **argv)
@@ -76,28 +77,50 @@ int main(int argc, char **argv)
 
     // set up the rest of ebcBlockData
     // checks for any error codes that may have been returned
-    check = setEbcBlockData(outputData);
+    int check = setEbcBlockData(outputData);
     if (check != 0)
     {
+        freeEbcData(inputData);
+        freeEbcBlockData(outputData);
         return check;
     }
 
+    // find block data and store to data struct
     calculateBlockData(outputData);
 
-    
+    // compress data blocks to 5 bits
+    convertEbu2Ebc(outputData->blocksUncompressed, outputData->blocksCompressed, outputData->numBlocksUncompressed);
+
+    // free ebcData since data is no longer required
+    freeEbcData(inputData);
 
 
+    /*      OUTPUTTING BLOCKS IMAGE DATA TO FILE       */
 
+    // get and open the output file in write mode
+    char *outputFilename = argv[2];
+    FILE *outputFile = loadOutputFileBinary(outputFilename);
+    // validate that the file has been opened correctly
+    if (badFile(outputFile, outputFilename))
+    { // validate output file
+        freeEbcBlockData(outputData);
+        return BAD_FILE;
+    } // validate output file
 
-    
-    
+    // output to file
+    errCode = outputFileDataCompressedBlockBinary(outputData, outputFile);
+    // checking for any error codes
+    if (errCode != 0)
+    {
+        // exit with the error code and free any data used in the program
+        freeEbcBlockData(outputData);
+        fclose(outputFile);
+        return errCode;
+    }
 
-
-
-
-    // compress blocks
-    // output block file data
-
-
-
+    // print final success message, free and return
+    printf("BLOCKED\n");
+    freeEbcBlockData(outputData);
+    fclose(outputFile);
+    return SUCCESS;
 }

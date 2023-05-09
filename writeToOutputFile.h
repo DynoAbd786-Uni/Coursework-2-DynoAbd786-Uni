@@ -42,6 +42,9 @@ int outputFileDataCompressedBinary(ebcData *data, FILE *outputFile);
 // for ebc to ebu outputs
 int outputFileDataEbcDirectEbu(ebcData *data, FILE *outputFile);
 
+// for ebc to ebcBlock outputs
+int outputFileDataCompressedBlockBinary(ebcBlockData *data, FILE *outputFile);
+
 
 
 

@@ -4,7 +4,7 @@
 #include "blockHandling.h"
 
 // takes an image and calcualtes the 3x3 pixel blocks respective to that image 
-void calcualteBlockData(ebcBlockData *data)
+void calculateBlockData(ebcBlockData *data)
 {
     int pixelTrackerRow = 0;
     int pixelTrackerColumn = 0;
@@ -42,7 +42,7 @@ void calcualteBlockData(ebcBlockData *data)
                     }
 
                     totalPixelValues = totalPixelValues + data->imageDataUncompressed[pixelTrackerRow][pixelTrackerColumn];
-                    pixelcount++;
+                    pixelCount++;
                 }
             }
 

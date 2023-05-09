@@ -269,7 +269,7 @@ int outputImageDataEbuDirectEbc(ebuData *data, FILE *outputFile)
     }
 
     // convert uncompressed binary format to compressed binary
-    compressedBinaryArray = convertEbu2Ebc(data->dataBlock, compressedBinaryArray, data->numBytes);
+    convertEbu2Ebc(data->dataBlock, compressedBinaryArray, data->numBytes);
 
     // write the entire dataBlock to the file
     if (badOutput(fwrite(compressedBinaryArray, sizeOfCompressedBinaryArray, 1, outputFile)))
@@ -324,3 +324,28 @@ int outputFileDataEbcDirectEbu(ebcData *data, FILE *outputFile)
 
     return 0;
 }
+
+
+// outputs all data to a file, where the pixel values are in compressed binary
+// returns error code if output has failed, 0 if successful
+int outputFileDataCompressedBlockBinary(ebcBlockData *data, FILE *outputFile)
+{
+    // define the header that needs to be outputted to the file
+    unsigned char *header = (unsigned char *) "EC";
+    // output header to file and validate for success (0 means success)
+    if (outputHeader(header, data->height, data->width, outputFile) != 0)
+    {
+        return BAD_OUTPUT;
+    }
+    // output image data to file and validate for success (0 means success)
+    int errCode = outputImageDataBinary(data->blocksCompressed, data->numBlocksCompressed, outputFile);
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    return 0;
+}
+
+
+

@@ -247,6 +247,8 @@ void copyEbcDataToEbcBlockData(ebcData *inputData, ebcBlockData *outputData)
     outputData->height = inputData->height;
 
     // copying uncompressedImageData
-    outputData->dataBlockUncompressed = inputData->dataBlockUncompressed;    
+    outputData->dataBlockUncompressed = inputData->dataBlockUncompressed;
+    // dereferencing uncompressed data block so ebcData struct can be freed
+    inputData->dataBlockUncompressed = NULL;
 }
 

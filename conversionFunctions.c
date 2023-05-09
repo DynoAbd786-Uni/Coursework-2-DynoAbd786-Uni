@@ -18,7 +18,7 @@ unsigned int convertEbu2Ebf(BYTE pixelValueBinary)
 }
 
 // function converts an array of uncompressed binary pixels to compressed binary format 
-BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytesUncompressed)
+void convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytesUncompressed)
 {    
     // variables for storing and tracking compressed binary information
     BYTE storageByte = 0;
@@ -57,8 +57,6 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
 
     // output final byte to the compressed array
     compressedBinaryArray[compressedBinaryArrayPostitionTracker] = storageByte;
-
-    return compressedBinaryArray;
 }
 
 // function converts an array of compressed binary pixels to uncompressed binary format

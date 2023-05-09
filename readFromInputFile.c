@@ -486,6 +486,56 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
 
 /*      FOR EBCC FILES      */
 
+
+// executes a series of funcions to gather and check all data from an ebu file
+// returns respected error code to the error that may have occured in the file, 0 if successful
+int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FILE *inputFile))
+{   
+    // set first 2 characters which should be magic number
+    int errCode = getMagicNumber(inputFile, inputData->magicNumber);
+    // checking for correct file format
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    // checking if the magic number matches the known magic number value
+    // checking against the casted value due to endienness.
+    if (badMagicNumberEbcBlock(getMagicNumberValue(inputData->magicNumber), filename))
+    { // check magic number
+        return BAD_MAGIC_NUMBER;
+    } // check magic number
+
+
+    // scan for the dimensions
+    // and capture fscanfs return to ensure we got 2 values.
+    int check = getDimensions(&inputData->height, &inputData->width, inputFile);
+    // check if dimensions satisfy requirements
+    if (badDimensions(inputData->height, inputData->width, check, filename))
+    { // check dimensions
+        return BAD_DIM;
+    } // check dimensions
+
+    // set up data array to store pixel values later
+    // checks for any error codes that may have been returned
+    check = setCompressedBinaryImageDataArrayEbc(inputData);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // get image data from the file and store it to the struct 
+    // checks for any error codes that may have been returned
+    check = getCompressedBinaryImageDataArray(inputData, inputFile, filename);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // return 0 for success
+    return 0;
+}
+
 // mallocs and sets up data arrays in ebcBlockData
 int setEbcBlockData(ebcBlockData *data)
 {
@@ -518,7 +568,6 @@ int setEbcBlockData(ebcBlockData *data)
     {
         data->imageDataUncompressed[row] = data->dataBlockUncompressed + row * data->width;
     }
-    return 0;
 
 
     // set up blocksUncompressed array
@@ -573,6 +622,8 @@ int setEbcBlockData(ebcBlockData *data)
     { // check malloc
         return BAD_MALLOC;
     } // check malloc
+
+    return 0;
 }
 
 
