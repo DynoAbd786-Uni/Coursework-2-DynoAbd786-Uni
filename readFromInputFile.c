@@ -427,13 +427,18 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
 
     // uncompressed data block malloc'd
     // 2D imageData not needed since the program can just write the whole block in 1 go
-    data->dataBlockUncompressed = (BYTE *) malloc(data->numBytesUncompressed * sizeof(BYTE));
+    if (data->dataBlockUncompressed == NULL)
+    {
+        data->dataBlockUncompressed = (BYTE *) malloc(data->numBytesUncompressed * sizeof(BYTE));
 
-    // if malloc is unsucessful, it will return a null pointer
-    if (badMalloc(data->dataBlockUncompressed))
-    { // check malloc
-        return BAD_MALLOC;
-    } // check malloc
+        // if malloc is unsucessful, it will return a null pointer
+        if (badMalloc(data->dataBlockUncompressed))
+        { // check malloc
+            return BAD_MALLOC;
+        } // check malloc
+    }
+    
+    
 
     // compressed data block malloc'd to store and convert compressed imageData
     data->dataBlockCompressed = (BYTE *) malloc(data->numBytesCompressed * sizeof(BYTE));
@@ -489,7 +494,7 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
 
 // executes a series of funcions to gather and check all data from an ebu file
 // returns respected error code to the error that may have occured in the file, 0 if successful
-int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FILE *inputFile))
+int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
     int errCode = getMagicNumber(inputFile, inputData->magicNumber);
@@ -518,7 +523,7 @@ int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FI
 
     // set up data array to store pixel values later
     // checks for any error codes that may have been returned
-    check = setCompressedBinaryImageDataArrayEbc(inputData);
+    check = setEbcBlockData(inputData);
     if (check != 0)
     {
         return check;
@@ -526,7 +531,7 @@ int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FI
 
     // get image data from the file and store it to the struct 
     // checks for any error codes that may have been returned
-    check = getCompressedBinaryImageDataArray(inputData, inputFile, filename);
+    check = getCompressedBlockImageDataArray(inputData, inputFile, filename);
     if (check != 0)
     {
         return check;
@@ -625,5 +630,41 @@ int setEbcBlockData(ebcBlockData *data)
 
     return 0;
 }
+
+// gets image data from an ebcBlock compressed binary file
+int getCompressedBlockImageDataArray(ebcBlockData *data, FILE *inputFile, char *filename)
+{
+    // checks and cycles to next line (sitting on line with the dimensions currently)
+    if (noWhitespaceOrNull(getc(inputFile)))
+    {
+        return MISCELLANEOUS;
+    }
+    
+    // read in all the compressed pixel data
+    fread(data->blocksCompressed, sizeof(BYTE), data->numBlocksCompressed, inputFile);
+
+    // decompress data to check individual amount of pixels in file
+    // not possible in this case to check pixel values, since compressed size has only 2^5 bits
+    // therefore has guaranteed range of 0 to 31
+    // check if number of decompressed bytes matches the assigned numBytesUncompressed
+    if (badNumBytes(convertEbc2Ebu(data->blocksCompressed, data->blocksUncompressed, data->numBlocksCompressed, data->numBlocksUncompressed), data->numBlocksUncompressed, filename))
+    {
+        return BAD_DATA;
+    } 
+    
+    // extra bit of code to get rid of the null char so the file indicates EOF
+    BYTE tmp;
+    fread(&tmp, sizeof(BYTE), 1, inputFile);
+    
+
+    // check if end of file has been reached
+    if (notEndOfFile(inputFile, filename))
+    {
+        return BAD_DATA;
+    }
+
+    return 0;
+}
+
 
 

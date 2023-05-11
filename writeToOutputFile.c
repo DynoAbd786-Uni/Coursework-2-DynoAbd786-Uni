@@ -289,7 +289,11 @@ int outputImageDataEbuDirectEbc(ebuData *data, FILE *outputFile)
 int outputFileDataCompressedBinary(ebcData *data, FILE *outputFile)
 {
     // output header to file and validate for success (0 means success)
-    if (outputHeader(data->magicNumber, data->height, data->width, outputFile) != 0)
+    
+    // define the header that needs to be outputted to the file
+    unsigned char *header = (unsigned char *) "ec";
+
+    if (outputHeader(header, data->height, data->width, outputFile) != 0)
     {
         return BAD_OUTPUT;
     }

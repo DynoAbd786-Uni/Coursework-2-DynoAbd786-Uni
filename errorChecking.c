@@ -105,6 +105,20 @@ int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename)
     return 0;
 }
 
+// checking against known ebc magic number
+// returns 1 if magic number doesnt match known value
+int badMagicNumberEbcBlock(unsigned short *magicNumberValue, char *filename)
+{
+    // check magic number
+    if (*magicNumberValue != MAGIC_NUMBER_EBC_BLOCK)
+    {
+        printf("ERROR: Bad Magic Number (%s)\n", filename);
+        return 1;
+    }
+
+    return 0;
+}
+
 
 /*      BAD DIMENSIONS      */
 // check dimensions to see if 2 values have been captured, and if dimensions are within acceptable range

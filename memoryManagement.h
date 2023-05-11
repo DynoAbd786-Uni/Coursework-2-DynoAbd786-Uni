@@ -39,3 +39,5 @@ ebcBlockData *mallocEbcBlock();
 void freeEbcBlockData(ebcBlockData *data);
 
 void copyEbcDataToEbcBlockData(ebcData *inputData, ebcBlockData *outputData);
+
+void copyEbcBlockDataToEbcData(ebcBlockData *inputData, ebcData *outputData);
