@@ -44,6 +44,21 @@ int badArguements(int argc)
     return 0;
 }
 
+// error code for the random block compression programs
+// validate that user has enter 2 arguments (plus the executable name)
+// Returns 1 if the wrong amount of arguements are provided
+int badArguementsRandom(int argc)
+{
+    // check arg count
+    if (argc != 4)
+    { 
+        printf("ERROR: Bad Arguments\n");
+        return 1;
+    } 
+
+    return 0;
+}
+
 
 /*      BAD FILE      */
 // check file opened successfully

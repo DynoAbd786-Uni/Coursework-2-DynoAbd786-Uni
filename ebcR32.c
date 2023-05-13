@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "fileStructs.h"
 #include "memoryManagement.h"
@@ -21,10 +22,16 @@ int main(int argc, char **argv)
     }
 
     // validate that user has enter 2 arguments (plus the executable name)
-    if (badArguements(argc))
+    if (badArguementsRandom(argc))
     { // check arg count
         return BAD_ARGS;
     } // check arg count
+
+    // find out which program is being used to find out how many paradigm blocks are required
+    int noParadigmBlocks = calculateNoParadigmBlocks(argv[0]);
+
+    // save the seed from command line
+    int seedForRandomGenerator = atoi(argv[3]);
 
 
     /*      TAKING INPUT FROM FILE      */
@@ -64,66 +71,63 @@ int main(int argc, char **argv)
     /*      CONVERTING IMAGE DATA INTO BLOCKS     */
 
     // malloc a struct of type ebcBlockData to store data to
-    ebcBlockData *outputData = mallocEbcBlock();
+    ebcBlockData *dataConversionHolder = mallocEbcBlock();
     // checking if struct has been malloc'd
-    if (badMalloc(outputData))
+    if (badMalloc(dataConversionHolder))
     {
         freeEbcData(inputData);
         return BAD_MALLOC;
     }
 
     // copy over data from ebcData struct to ebcBlockData struct for easier data handling
-    copyEbcDataToEbcBlockData(inputData, outputData);
+    copyEbcDataToEbcBlockData(inputData, dataConversionHolder);
 
     // set up the rest of ebcBlockData
     // checks for any error codes that may have been returned
-    int check = setEbcBlockData(outputData);
+    int check = setEbcBlockData(dataConversionHolder);
     if (check != 0)
     {
         freeEbcData(inputData);
-        freeEbcBlockData(outputData);
+        freeEbcBlockData(dataConversionHolder);
         return check;
     }
 
     // find block data and store to data struct
-    calculateBlockData(outputData);
-
-    // set image data to average values.
-    setBlocksAsAverageValue(outputData);
-
-    // compress data blocks to 5 bits
-    convertEbu2Ebc(outputData->blocksUncompressed, outputData->blocksCompressed, outputData->numBlocksUncompressed);
+    calculateBlockData(dataConversionHolder);
 
     // free ebcData since data is no longer required
     freeEbcData(inputData);
 
 
-    /*      OUTPUTTING BLOCKS IMAGE DATA TO FILE       */
+    /*      RANDOMISING BLOCKS      */
 
-    // get and open the output file in write mode
-    char *outputFilename = argv[2];
-    FILE *outputFile = loadOutputFileBinary(outputFilename);
-    // validate that the file has been opened correctly
-    if (badFile(outputFile, outputFilename))
-    { // validate output file
-        freeEbcBlockData(outputData);
-        return BAD_FILE;
-    } // validate output file
-
-    // output to file
-    errCode = outputFileDataCompressedBlockBinary(outputData, outputFile);
-    // checking for any error codes
-    if (errCode != 0)
+    // malloc a struct of type ebcBlockData to store data to
+    ebcRandomBlockData *outputData = mallocEbcRandomBlock();
+    // checking if struct has been malloc'd
+    if (badMalloc(outputData))
     {
-        // exit with the error code and free any data used in the program
-        freeEbcBlockData(outputData);
-        fclose(outputFile);
-        return errCode;
+        freeEbcBlockData(dataConversionHolder);
+        return BAD_MALLOC;
     }
 
-    // print final success message, free and return
-    printf("BLOCKED\n");
-    freeEbcBlockData(outputData);
-    fclose(outputFile);
-    return SUCCESS;
+    copyEbcBlockDataToEbcRandomBlockData(dataConversionHolder, outputData);
+
+    // set up ebcRandomBlockData struct
+    check = setEbcRandomBlockData(outputData, noParadigmBlocks);
+    if (check != 0)
+    {
+        freeEbcBlockData(dataConversionHolder);
+        freeEbcRandomBlockData(outputData);
+        return check;
+    }
+
+    // calculate image data based on randomisation of blocks
+    randomiseBlockData(dataConversionHolder, outputData, seedForRandomGenerator);
+
 }
+
+
+    
+
+    
+

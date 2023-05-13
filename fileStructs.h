@@ -39,6 +39,18 @@ typedef struct
 ebcData;
 
 
+// struct for storing block data according to the top left pixel index
+typedef struct
+{
+    int rowNum;
+    int columnNum;
+    int numPixelsInBlock;
+    int totalValueOfBlock;
+    int averageValueOfBlock;
+}
+block;
+
+
 // struct for storing data from an ebcc file
 typedef struct
 {
@@ -52,8 +64,30 @@ typedef struct
     BYTE *blocksUncompressed;
     BYTE **imageDataUncompressed;
     BYTE *dataBlockUncompressed;
+    block *blocksInImage;
 }
 ebcBlockData;
+
+
+// struct for storing data from an ebcc random block file
+typedef struct 
+{
+    unsigned char magicNumber[2];
+    int width, height;
+    int numParadigmBlocksUncompressed;
+    int numParadigmBlocksCompressed;
+    int numBitsCompressed;
+    long numBlocksUncompressed;         // variables for finding how many bytes 
+    long numBlocksCompressed;           // are needed for these arrays
+    BYTE *compressedParadigmBlocks;         // stores the values for the paradigm blocks being used in the program
+    BYTE *uncompressedParadigmBlocks;           // ^
+    BYTE *dataBlockCompressed;          // stores the location for the paradigm blocks being used in the image
+    BYTE *dataBlockUncompressed;        // ^ 
+}
+ebcRandomBlockData;
+
+
+
 
 
 

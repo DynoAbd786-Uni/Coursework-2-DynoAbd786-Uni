@@ -41,3 +41,10 @@ void freeEbcBlockData(ebcBlockData *data);
 void copyEbcDataToEbcBlockData(ebcData *inputData, ebcBlockData *outputData);
 
 void copyEbcBlockDataToEbcData(ebcBlockData *inputData, ebcData *outputData);
+
+
+ebcRandomBlockData *mallocEbcRandomBlock();
+
+void freeEbcRandomBlockData(ebcRandomBlockData *data);
+
+void copyEbcBlockDataToEbcRandomBlockData(ebcBlockData *inputData, ebcRandomBlockData *outputData);

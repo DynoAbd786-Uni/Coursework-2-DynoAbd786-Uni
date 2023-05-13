@@ -25,6 +25,8 @@ int noArguements(int argc, char **argv);
 
 int badArguements(int argc);
 
+int badArguementsRandom(int argc);      // for random compression algorithms
+
 // checks if file is open
 int badFile(FILE *file, char *filename);
 

@@ -230,6 +230,14 @@ void freeEbcBlockData(ebcBlockData *data)
         data->dataBlockUncompressed = NULL;
     }
 
+    // checks if blocksInImage has been malloc'd
+    if (data->blocksInImage != NULL)
+    {
+        // free and dereference blocksInImage to NULL to avoid hanging pointer
+        free(data->blocksInImage);
+        data->blocksInImage = NULL;
+    }
+
     // checks if data struct has been malloc'd
     if (data != NULL)
     {
@@ -267,4 +275,67 @@ void copyEbcBlockDataToEbcData(ebcBlockData *inputData, ebcData *outputData)
 
     
 }
+
+// mallocs an uninitialised struct of type ebcRandomBlockData to store file information to
+// returns the data struct
+ebcRandomBlockData *mallocEbcRandomBlock()
+{
+    ebcRandomBlockData *data = (ebcRandomBlockData *) malloc(sizeof(ebcRandomBlockData));
+    return data;
+}
+
+// frees 1 data entry from the type ebcBlockData
+void freeEbcRandomBlockData(ebcRandomBlockData *data)
+{
+    // checks if compressedParadigmBlocks has been malloc'd
+    if (data->compressedParadigmBlocks != NULL)
+    {
+        // free and dereference compressedParadigmBlocks to NULL to avoid hanging pointer
+        free(data->compressedParadigmBlocks);
+        data->compressedParadigmBlocks = NULL;
+    }
+
+    // checks if uncompressedParadigmBlocks has been malloc'd
+    if (data->uncompressedParadigmBlocks != NULL)
+    {
+        // free and dereference uncompressedParadigmBlocks to NULL to avoid hanging pointer
+        free(data->uncompressedParadigmBlocks);
+        data->uncompressedParadigmBlocks = NULL;
+    }
+
+    // checks if dataBlockCompressed has been malloc'd
+    if (data->dataBlockCompressed != NULL)
+    {
+        // free and dereference dataBlockCompressed to NULL to avoid hanging pointer
+        free(data->dataBlockCompressed);
+        data->dataBlockCompressed = NULL;
+    }
+
+    // checks if dataBlockUncompressed has been malloc'd
+    if (data->dataBlockUncompressed != NULL)
+    {
+        // free and dereference dataBlockUncompressed to NULL to avoid hanging pointer
+        free(data->dataBlockUncompressed);
+        data->dataBlockUncompressed = NULL;
+    }
+
+    // checks if data struct has been malloc'd
+    if (data != NULL)
+    {
+        // free and dereference data struct to NULL to avoid hanging pointer
+        free(data);
+        data = NULL;
+    }
+}
+
+void copyEbcBlockDataToEbcRandomBlockData(ebcBlockData *inputData, ebcRandomBlockData *outputData)
+{
+    // copying dimensions
+    outputData->width = inputData->width;
+    outputData->height = inputData->height;
+
+    // copying numBlocks
+    outputData->numBlocksUncompressed = inputData->numBlocksUncompressed;
+}
+
 
