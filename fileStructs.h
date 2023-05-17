@@ -1,6 +1,9 @@
 // Struct types for all files
 #include <stdint.h>
 
+// globally define MAX_BLOCK_SIZE for random functions
+#define MAX_BLOCK_SIZE 3
+
 // assigns type uint8_t to type BYTE for better readability
 typedef uint8_t BYTE;
 
@@ -44,9 +47,13 @@ typedef struct
 {
     int rowNum;
     int columnNum;
+    int rowSize;
+    int columnSize;
     int numPixelsInBlock;
     int totalValueOfBlock;
     int averageValueOfBlock;
+    BYTE blockImage[MAX_BLOCK_SIZE][MAX_BLOCK_SIZE];
+    BYTE dataBlock[MAX_BLOCK_SIZE * MAX_BLOCK_SIZE];
 }
 block;
 

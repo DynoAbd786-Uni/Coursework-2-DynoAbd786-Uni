@@ -9,6 +9,7 @@
 #include "conversionFunctions.h"
 #include "memoryManagement.h"
 #include "readFromInputFile.h"
+#include "blockHandling.h"
 
 // executes a series of funcions to gather and check all data from an ebf file
 // returns respected error code to the error that may have occured in the file, 0 if successful
@@ -706,7 +707,7 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
     if (data->uncompressedParadigmBlocks == NULL)
     {
         // data block malloc'd to set up 2D array for imageDataUncompressed
-        data->uncompressedParadigmBlocks = (BYTE *) malloc(data->numParadigmBlocksUncompressed * sizeof(BYTE));
+        data->uncompressedParadigmBlocks = (BYTE *) malloc(data->numParadigmBlocksUncompressed * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE * sizeof(BYTE));
 
         // if malloc is unsuccessful, it will return a null pointer
         if (badMalloc(data->uncompressedParadigmBlocks))
@@ -751,7 +752,7 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
     }
 
     // malloc data for compressedParadigmBlocks 
-    data->compressedParadigmBlocks = (BYTE *) malloc(data->numParadigmBlocksCompressed * sizeof(BYTE));
+    data->compressedParadigmBlocks = (BYTE *) malloc(data->numParadigmBlocksCompressed * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE * sizeof(BYTE));
 
     // if malloc is unsuccessful, it will return a null pointer
     if (badMalloc(data->compressedParadigmBlocks))
