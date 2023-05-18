@@ -10,9 +10,9 @@ CC     = gcc
 CFLAGS = -std=c99 -Wall -Werror -g -Wextra -lm 
 LDLIBS = -lm
 # this is your list of executables which you want to compile with all
-EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho ebcComp ebc2ebu ebcBlock ebcUnblock ebcR32
+EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho ebcComp ebc2ebu ebcBlock ebcUnblock ebcR32 ebcR128
 
-SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebcComp.c ebc2ebu.c ebcBlock.c ebcUnblock.c ebcR32.c errorChecking.c readFromInputFile.c writeToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c blockHandling.c
+SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebcComp.c ebc2ebu.c ebcBlock.c ebcUnblock.c ebcR32.c ebcR128.c errorChecking.c readFromInputFile.c writeToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c blockHandling.c
 
 OBJ = $(SRCS:.c=.o)
 
@@ -104,4 +104,7 @@ ebcUnblock: ebcUnblock.o errorChecking.o readFromInputFile.o writeToOutputFile.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebcR32: ebcR32.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o blockHandling.o
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+
+ebcR128: ebcR128.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o blockHandling.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
