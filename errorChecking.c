@@ -4,6 +4,7 @@
 #include "fileStructs.h"
 #include "errorChecking.h"
 
+
 // all functions within this file return 1 for any error detected, 0 otherwise
 
 /*      NO ARGUEMENTS       */
@@ -300,6 +301,19 @@ int noWhitespaceOrNull(char character)
         printf("ERROR: Miscellaneous (file format is incorrect (no whitespace char where there is meant to be a whitespace char))");
         return 1;
     } 
+
+    return 0;
+}
+
+/*      BAD PROVIDED BIT COUNT      */
+// checks to see if the bit count exceeds the max bits
+int tooManyBitsForCompression(int numBits)
+{
+    if (numBits > MAX_BITS_IN_BYTE || numBits < 1)
+    {
+        printf("ERROR: Miscellaneous (attempting to compress to a bit count higher than %i, or less than 1)", MAX_BITS_IN_BYTE);
+        return 1;
+    }
 
     return 0;
 }

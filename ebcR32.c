@@ -121,9 +121,50 @@ int main(int argc, char **argv)
         return check;
     }
 
+    
     // calculate image data based on randomisation of blocks
-    randomiseBlockData(dataConversionHolder, outputData, seedForRandomGenerator);
+    check = randomiseBlockData(dataConversionHolder, outputData, seedForRandomGenerator);
+    if (check != 0)
+    {
+        freeEbcBlockData(dataConversionHolder);
+        freeEbcRandomBlockData(outputData);
+        return check;
+    }
 
+    // free block data as this is no longer needed
+    freeEbcBlockData(dataConversionHolder);
+
+    
+
+
+    /*      OUTPUTTING BLOCKS IMAGE DATA TO FILE       */
+
+    // get and open the output file in write mode
+    char *outputFilename = argv[2];
+    FILE *outputFile = loadOutputFileBinary(outputFilename);
+    // validate that the file has been opened correctly
+    if (badFile(outputFile, outputFilename))
+    { // validate output file
+        freeEbcRandomBlockData(outputData);
+        return BAD_FILE;
+    } // validate output file
+
+    // output to file
+    errCode = outputFileDataCompressedRandomBlockBinary(outputData, outputFile);
+    // checking for any error codes
+    if (errCode != 0)
+    {
+        // exit with the error code and free any data used in the program
+        freeEbcRandomBlockData(outputData);
+        fclose(outputFile);
+        return errCode;
+    }
+
+    // print final success message, free and return
+    printf("BLOCKED\n");
+    freeEbcRandomBlockData(outputData);
+    fclose(outputFile);
+    return SUCCESS;
 }
 
 

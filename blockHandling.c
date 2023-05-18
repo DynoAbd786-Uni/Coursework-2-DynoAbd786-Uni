@@ -91,6 +91,8 @@ void calculateBlockData(ebcBlockData *data)
             averageValueForBlock = (int) round((float) totalPixelValues / (float) pixelCount);
             data->blocksInImage[blockTracker].averageValueOfBlock = averageValueForBlock;
 
+            data->blocksInImage[blockTracker] = getBlockImage(data->imageDataUncompressed, data->blocksInImage[blockTracker]);
+
             // move to next block
             blockTracker++;
             
@@ -177,13 +179,16 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
         printf("Do be advised that running this program may result in a file larger in size than the input file. The program will still run, but for storage reasons you are better off just using the normal .ebc file\n");
     }
     // set up an array of indexes to block numbers so that it can be cross referenced for repeated index values
-    int *blockIndexStorage = (int *) malloc(outputData->numParadigmBlocksUncompressed * sizeof(BYTE));
+    int *excludedBlockIndexStorage = (int *) malloc(outputData->numBlocksUncompressed * sizeof(int));
 
     // if malloc is unsuccessful, it will return a null pointer
-    if (badMalloc(blockIndexStorage))
+    if (badMalloc(excludedBlockIndexStorage))
     { // check malloc
         return BAD_MALLOC;
     } // check malloc
+
+    // track num of excluded blocks
+    int noOfExcludedBlocks = 0;
 
     // set up the seed for the randomiser
     srand(seed);
@@ -191,22 +196,26 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
     // initialise random block variable 
     int randomBlock = 0;
 
-    // set variables to keep track of amount of blocks selected  
+    // set variables to keep track of amount of blocks and pixels selected  
     int totalParadigmBlocksSelected = 0;
-
     int continueFlag = 0;
+    int pixelTrackerForParadigmBlocks = 0;
 
-    // repeat until number of blocks selected matches the number of paradigm blocks required
+    // repeat until number of blocks selected matches the number of paradigm blocks required, or if the total number of blocks matches the numBlocksUncompressed
     while (totalParadigmBlocksSelected < outputData->numParadigmBlocksUncompressed)
     {
+        if (noOfExcludedBlocks == dataConversionHolder->numBlocksUncompressed)
+        {
+            break;
+        }
         // pick a random block using rand
         randomBlock = rand() % dataConversionHolder->numBlocksUncompressed;
 
         // loop through the array and check if the randomised block has been selected
-        for (int blockNumber = 0; blockNumber < totalParadigmBlocksSelected; blockNumber++)
+        for (int blockNumber = 0; blockNumber < noOfExcludedBlocks; blockNumber++)
         {
             // if there is an identical block, run the randomiser again
-            if (blockIndexStorage[blockNumber] == randomBlock)
+            if (excludedBlockIndexStorage[blockNumber] == randomBlock)
             {
                 continueFlag = 1;
                 break;
@@ -214,36 +223,53 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
             else
             {
                 // checking for the unlikely case of there being 2 same blocks, but from different index points
+                // counter used to check if all 9 values are the same
                 int pixelCounter = 0;
 
+                // looping through each pixel in both blocks
                 for (int rowNum = 0; rowNum < MAX_BLOCK_SIZE; rowNum++)
                 {
                     for (int columnNum = 0; columnNum < MAX_BLOCK_SIZE; columnNum++)
                     {
-                        // save block of image data
-                        outputData->uncompressedParadigmBlocks[(totalParadigmBlocksSelected * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE) + (rowNum + columnNum)] = dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum];
+                        // if the pixel within the random number block, is the same as the pixel within the specified block in the excludedBlockIndexStorage array, increment the pixelCounter by 1
+                        if (dataConversionHolder->blocksInImage[excludedBlockIndexStorage[blockNumber]].blockImage[rowNum][columnNum] == dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum])
+                        {
+                            pixelCounter++;
+                        }
                     }
+                }
+
+                // if all 9 pixels match, run the randomiser again
+                if (pixelCounter == 9)
+                {
+                    excludedBlockIndexStorage[noOfExcludedBlocks] = randomBlock;
+                    noOfExcludedBlocks++;
+                    continueFlag = 1;
+                    break;
                 }
             }
         }
 
+        // runs when a continue has been detected
         if (continueFlag)
         {
-            continue
+            continueFlag = 0;
+            continue;
         }
 
-        // save the index of the block
-        blockIndexStorage[totalParadigmBlocksSelected] = randomBlock;
-        
-        // grab 3x3 image
-        getBlockImage(dataConversionHolder->imageDataUncompressed, dataConversionHolder->blocksInImage[randomBlock]);
+        // save the index of the block and increment the respective tracker
+        excludedBlockIndexStorage[noOfExcludedBlocks] = randomBlock;
+        noOfExcludedBlocks++;
 
+        // output block to paradigm blocks
         for (int rowNum = 0; rowNum < MAX_BLOCK_SIZE; rowNum++)
         {
             for (int columnNum = 0; columnNum < MAX_BLOCK_SIZE; columnNum++)
             {
+                // printf("%i, ", pixelTrackerForParadigmBlocks);
                 // save block of image data
-                outputData->uncompressedParadigmBlocks[(totalParadigmBlocksSelected * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE) + (rowNum + columnNum)] = dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum];
+                outputData->uncompressedParadigmBlocks[pixelTrackerForParadigmBlocks] = (BYTE) dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum];
+                pixelTrackerForParadigmBlocks++;
             }
         }
         
@@ -252,14 +278,14 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
     }
 
     // free the temporary array
-    free(blockIndexStorage);
+    free(excludedBlockIndexStorage);
     // exit function with success
     return 0;
 }
 
 // grabs a 3x3 image according to the position of the indexed block's row and column, and writes it to the block
-
-void getBlockImage(BYTE **image, block blocks)
+// returns the block with the 3x3 image attached
+block getBlockImage(BYTE **image, block blocks)
 {
     // set up block tracker
     int blockTracker = 0;
@@ -267,13 +293,15 @@ void getBlockImage(BYTE **image, block blocks)
     // loop through block dimensions
     for (int rowInBlock = 0; rowInBlock < MAX_BLOCK_SIZE; rowInBlock++)
     {
+        // printf("%i\n", rowInBlock + blocks.rowNum);
         for (int columnInBlock = 0; columnInBlock < MAX_BLOCK_SIZE; columnInBlock++)
         {
-            // write the value of the pixel in the image to the respective block position
-            blocks.blockImage[rowInBlock][columnInBlock] = image[blocks.rowNum + rowInBlock][blocks.columnNum + columnInBlock];
-
-            // check if pixel value is within block limits. if not, use average to set pixel to while or black value
-            if (rowInBlock >= blocks.rowSize || columnInBlock + 1 >= blocks.columnSize)
+            if (rowInBlock + 1 < blocks.rowSize && columnInBlock + 1 < blocks.columnSize)
+            {
+                // write the value of the pixel in the image to the respective block position
+                blocks.blockImage[rowInBlock][columnInBlock] = image[blocks.rowNum + rowInBlock][blocks.columnNum + columnInBlock];
+            }
+            else
             {
                 if (blocks.averageValueOfBlock < MIDDLE_VALUE_OF_PIXEL)
                 {
@@ -286,10 +314,13 @@ void getBlockImage(BYTE **image, block blocks)
             }
 
             // set block image to the pixel value at the image dimensions
-            blocks.dataBlock[blockTracker] = image[blocks.rowNum + rowInBlock][blocks.columnNum + columnInBlock];
+            blocks.dataBlock[blockTracker] = blocks.blockImage[rowInBlock][columnInBlock];
 
             // increment block counter
             blockTracker++;
         }
     }
+
+    // return blocks
+    return blocks;
 }

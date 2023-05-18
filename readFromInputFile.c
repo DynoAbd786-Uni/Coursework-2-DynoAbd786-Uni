@@ -688,6 +688,13 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
 
     // calculate compression factor (since compression is either in 7 or 5 bits)
     data->numBitsCompressed = (int) ceil(log2(data->numParadigmBlocksUncompressed));
+
+    // in case a program may have greater than 8 bits to compress to, throw error
+    if (tooManyBitsForCompression(data->numBitsCompressed))
+    {
+        return 100;
+    }
+
     double compressionFactor = (double) data->numBitsCompressed / (double) MAX_BITS_IN_BYTE;
 
     // checks whether the data in dataBlockUncompressed alrady exists. if not, malloc new data

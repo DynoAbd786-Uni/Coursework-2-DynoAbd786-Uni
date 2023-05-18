@@ -19,6 +19,7 @@
 #define MIN_DIMENSION 1
 #define MIN_PIXEL_VALUE 0
 #define MAX_PIXEL_VALUE 31
+#define MAX_BITS_IN_BYTE 8
 
 // checks arguements
 int noArguements(int argc, char **argv);
@@ -69,3 +70,6 @@ int badOutput(int check);
 // miscellaneous checks 
 // checks file format 
 int noWhitespaceOrNull(char character);
+
+// checks correct bits for compression
+int tooManyBitsForCompression(int numBits);

@@ -330,12 +330,35 @@ int outputFileDataEbcDirectEbu(ebcData *data, FILE *outputFile)
 }
 
 
-// outputs all data to a file, where the pixel values are in compressed binary
+// outputs all data to a file, where the pixel values are in compressed block binary
 // returns error code if output has failed, 0 if successful
 int outputFileDataCompressedBlockBinary(ebcBlockData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
     unsigned char *header = (unsigned char *) "EC";
+    // output header to file and validate for success (0 means success)
+    if (outputHeader(header, data->height, data->width, outputFile) != 0)
+    {
+        return BAD_OUTPUT;
+    }
+    // output image data to file and validate for success (0 means success)
+    int errCode = outputImageDataBinary(data->blocksCompressed, data->numBlocksCompressed, outputFile);
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    return 0;
+}
+
+// outputs all data to a file, where the pixel values are in compressed random block binary
+// returns error code if output has failed, 0 if successful
+int outputFileDataCompressedRandomBlockBinary(ebcRandomBlockData *data, FILE *outputFile)
+{
+    // define the header that needs to be outputted to the file
+    unsigned char header[2];
+    header[0] = 'E';
+    header[1] = (unsigned char) data->numBitsCompressed;
     // output header to file and validate for success (0 means success)
     if (outputHeader(header, data->height, data->width, outputFile) != 0)
     {
