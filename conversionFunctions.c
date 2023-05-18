@@ -17,6 +17,10 @@ unsigned int convertEbu2Ebf(BYTE pixelValueBinary)
     return pixelValue;
 }
 
+
+
+/*      THESE ARE DEFAULT COMPRESSION ALGORITHMS USED TO COMPRESS TO AND FROM MAX_BITS_IN_UNCOMPRESSED_BYTE     */
+
 // function converts an array of uncompressed binary pixels to compressed binary format 
 void convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytesUncompressed)
 {    
@@ -106,6 +110,9 @@ long convertEbc2Ebu(BYTE *compressedPixelValues, BYTE *uncompressedBinaryArray, 
     return uncompressedBinaryArrayPostitionTracker;
 }
 
+
+
+/*      THESE ARE SPECIALISED COMPRESSION ALGORITHMS USED TO COMPRESS TO AND FROM numBitsToCompressTo     */
 
 // function converts an array of uncompressed binary pixels to compressed binary format, with a given bit to compress to 
 void compressDataToGivenBit(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytesUncompressed, int numBitsToCompressTo)
