@@ -131,10 +131,16 @@ int main(int argc, char **argv)
         return check;
     }
 
+    // assign paradigm blocks to image blocks
+    assignRandomBlocksToImage(outputData, dataConversionHolder);
+
+    // compress image data and paradigm blocks
+    compressDataToGivenBit(outputData->dataBlockUncompressed, outputData->dataBlockCompressed, outputData->numBlocksUncompressed, outputData->numBitsCompressed);
+    convertEbu2Ebc(outputData->uncompressedParadigmBlocks, outputData->compressedParadigmBlocks, outputData->numParadigmBlocksCompressed);
+
     // free block data as this is no longer needed
     freeEbcBlockData(dataConversionHolder);
 
-    
 
 
     /*      OUTPUTTING BLOCKS IMAGE DATA TO FILE       */

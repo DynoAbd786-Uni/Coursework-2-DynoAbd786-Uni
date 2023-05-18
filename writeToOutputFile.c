@@ -356,16 +356,28 @@ int outputFileDataCompressedBlockBinary(ebcBlockData *data, FILE *outputFile)
 int outputFileDataCompressedRandomBlockBinary(ebcRandomBlockData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
-    unsigned char header[2];
-    header[0] = 'E';
-    header[1] = (unsigned char) data->numBitsCompressed;
+    char stringHeader[2];
+    sprintf(stringHeader, "E%i", data->numBitsCompressed);
+    unsigned char *header = (unsigned char *) stringHeader;
+
     // output header to file and validate for success (0 means success)
     if (outputHeader(header, data->height, data->width, outputFile) != 0)
     {
         return BAD_OUTPUT;
     }
-    // output image data to file and validate for success (0 means success)
-    int errCode = outputImageDataBinary(data->blocksCompressed, data->numBlocksCompressed, outputFile);
+
+    // output paradigm blocks to file and validate for success (0 means success)
+    int errCode = outputImageDataBinary(data->compressedParadigmBlocks, data->numParadigmBlocksCompressed, outputFile);
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    // output new line for block data
+    fprintf(outputFile, "\n");
+
+    // output block positional data to file and validate for success (0 means success)
+    errCode = outputImageDataBinary(data->dataBlockCompressed, data->numBlocksCompressed, outputFile);
     if (errCode != 0)
     {
         return errCode;

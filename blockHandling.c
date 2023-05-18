@@ -269,6 +269,7 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
                 // printf("%i, ", pixelTrackerForParadigmBlocks);
                 // save block of image data
                 outputData->uncompressedParadigmBlocks[pixelTrackerForParadigmBlocks] = (BYTE) dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum];
+                outputData->paradigmBlocksIndex[totalParadigmBlocksSelected] = randomBlock;
                 pixelTrackerForParadigmBlocks++;
             }
         }
@@ -323,4 +324,53 @@ block getBlockImage(BYTE **image, block blocks)
 
     // return blocks
     return blocks;
+}
+
+// assigns positional values to the dataBlock, each representing a paradigm block
+void assignRandomBlocksToImage(ebcRandomBlockData *data, ebcBlockData *processData)
+{
+    // set variables to keep track of the dfference between the blocks
+    int minimumDifference = 0;
+    int currentDifference = 0;
+
+    // set variables to keep track of the paradigm block with the smallest difference
+    int smallestDifferenceParadigmBlock = 0;
+
+    // looping through every block inside the image
+    for (int imageBlockNo = 0; imageBlockNo < data->numBlocksUncompressed; imageBlockNo++)
+    {
+        // reset difference values to maximum difference
+        minimumDifference = MAX_PIXEL_VALUE;
+        currentDifference = MAX_PIXEL_VALUE;
+
+        // looping through the paradigm blocks
+        for (int paradigmBlockNo = 0; paradigmBlockNo < data->numParadigmBlocksUncompressed; paradigmBlockNo++)
+        {
+            // calculate the current difference by subtracting the current image block, with each paradigm block
+            currentDifference = processData->blocksInImage[imageBlockNo].totalValueOfBlock - processData->blocksInImage[data->paradigmBlocksIndex[paradigmBlockNo]].totalValueOfBlock;
+            
+            // if the current difference is exactly 0, set the respective location to the paradigm block 
+            if (currentDifference == 0)
+            {
+                smallestDifferenceParadigmBlock = paradigmBlockNo;
+                break;
+            }
+            
+            // flip sign
+            if (currentDifference < 0)
+            {
+                currentDifference = currentDifference * -1;
+            }
+
+            // check if current difference is smaller than minimum difference. if so, set new smallest difference and take note of the respective paradigm block 
+            if (currentDifference < minimumDifference)
+            {
+                minimumDifference = currentDifference;
+                smallestDifferenceParadigmBlock = paradigmBlockNo;
+            }
+        }
+        
+        // set the respective location of the image block according to the paradigm block with the smallest difference
+        data->dataBlockUncompressed[imageBlockNo] = smallestDifferenceParadigmBlock;
+    }
 }

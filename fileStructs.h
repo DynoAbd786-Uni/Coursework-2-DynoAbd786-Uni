@@ -86,6 +86,7 @@ typedef struct
     int numBitsCompressed;
     long numBlocksUncompressed;         // variables for finding how many bytes 
     long numBlocksCompressed;           // are needed for these arrays
+    int *paradigmBlocksIndex;
     BYTE *compressedParadigmBlocks;         // stores the values for the paradigm blocks being used in the program
     BYTE *uncompressedParadigmBlocks;           // ^
     BYTE *dataBlockCompressed;          // stores the location for the paradigm blocks being used in the image

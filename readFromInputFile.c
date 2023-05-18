@@ -723,6 +723,19 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
         } // check malloc
     }
 
+    // checks whether the data in paradigmBlocksIndex alrady exists. if not, malloc new data
+    if (data->paradigmBlocksIndex == NULL)
+    {
+        // data block malloc'd to set up 2D array for imageDataUncompressed
+        data->paradigmBlocksIndex = (int *) malloc(data->numParadigmBlocksUncompressed * sizeof(int));
+
+        // if malloc is unsuccessful, it will return a null pointer
+        if (badMalloc(data->paradigmBlocksIndex))
+        { // check malloc
+            return BAD_MALLOC;
+        } // check malloc
+    }
+
     // set up blocksCompressed array
     // calculates numBlocksCompressed 
     // extra bit of logic to account for any overhead in the file

@@ -13,3 +13,5 @@ int calculateNoParadigmBlocks(char *programName);
 int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *outputData, int seed);
 
 block getBlockImage(BYTE **image, block blocks);
+
+void assignRandomBlocksToImage(ebcRandomBlockData *data, ebcBlockData *processData);

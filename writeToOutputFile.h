@@ -45,6 +45,9 @@ int outputFileDataEbcDirectEbu(ebcData *data, FILE *outputFile);
 // for ebc to ebcBlock outputs
 int outputFileDataCompressedBlockBinary(ebcBlockData *data, FILE *outputFile);
 
+// for ebc to ebcRandomBlock outputs
+int outputFileDataCompressedRandomBlockBinary(ebcRandomBlockData *data, FILE *outputFile);
+
 
 
 

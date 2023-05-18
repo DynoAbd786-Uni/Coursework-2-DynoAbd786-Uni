@@ -319,6 +319,14 @@ void freeEbcRandomBlockData(ebcRandomBlockData *data)
         data->dataBlockUncompressed = NULL;
     }
 
+    // checks if paradigmBlocksIndex has been malloc'd
+    if (data->paradigmBlocksIndex != NULL)
+    {
+        // free and dereference paradigmBlocksIndex to NULL to avoid hanging pointer
+        free(data->paradigmBlocksIndex);
+        data->paradigmBlocksIndex = NULL;
+    }
+
     // checks if data struct has been malloc'd
     if (data != NULL)
     {
