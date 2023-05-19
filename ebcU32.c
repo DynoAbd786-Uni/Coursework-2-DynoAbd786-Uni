@@ -63,112 +63,102 @@ int main(int argc, char **argv)
     fclose(inputFile);
 
 
-    // /*      CONVERTING TO IMAGE DATA FROM BLOCK FORMAT       */
+    /*      CONVERTING TO IMAGE DATA FROM BLOCK FORMAT       */
 
-    // // malloc a struct of type ebcData to store data to
-    // ebcBlockData *dataConversionHolder = mallocEbcBlock();
-    // // checking if struct has been malloc'd
-    // if (badMalloc(dataConversionHolder))
-    // {
-    //     freeEbcRandomBlockData(inputData);
-    //     return BAD_MALLOC;
-    // }
+    // malloc a struct of type ebcData to store data to
+    ebcBlockData *dataConversionHolder = mallocEbcBlock();
+    // checking if struct has been malloc'd
+    if (badMalloc(dataConversionHolder))
+    {
+        freeEbcRandomBlockData(inputData);
+        return BAD_MALLOC;
+    }
     
-    // // copy over image data and dimensions to the ebcBlockData struct
-    // copyEbcRandomBlockDataToEbcBlockData(inputData, dataConversionHolder);
+    // copy over image data and dimensions to the ebcBlockData struct
+    copyEbcRandomBlockDataToEbcBlockData(inputData, dataConversionHolder);
 
-    // // set up ebcData for compressed data storage
-    // setEbcBlockData(dataConversionHolder);
-
-    // // calculate image data in compressed block format
-    // calculateRandomBlockImageData(inputData, dataConversionHolder);
-
-    // // free data struct as it is no longer needed
-    // freeEbcRandomBlockData(inputData);
-
-
+    // set up ebcData for compressed data storage
+    int check = setEbcBlockData(dataConversionHolder);
+    if (check != 0)
+    {
+        freeEbcBlockData(dataConversionHolder);
+        freeEbcRandomBlockData(inputData);
+        return check;
+    }
 
 
-    // // malloc a struct of type ebcData to store data to
-    // ebcData *outputData = mallocEbc();
-    // // checking if struct has been malloc'd
-    // if (badMalloc(outputData))
-    // {
-    //     freeEbcBlockData(dataConversionHolder);
-    //     return BAD_MALLOC;
-    // }
+    // calculate image data in compressed block format
+    check = calculateRandomBlockImageData(inputData, dataConversionHolder);
+    if (check != 0)
+    {
+        freeEbcBlockData(dataConversionHolder);
+        freeEbcRandomBlockData(inputData);
+        return check;
+    }
 
-    // // copy over image data and dimensions to the ebcData struct
-    // copyEbcBlockDataToEbcData(dataConversionHolder, outputData);
-
-    // // set up ebcData for compressed data storage
-    // setCompressedBinaryImageDataArrayEbc(outputData);
-
-    // // compress image data
-    // convertEbu2Ebc(outputData->dataBlockUncompressed, outputData->dataBlockCompressed, outputData->numBytesUncompressed);
-
-    // // free data struct as it is no longer needed
-    // freeEbcBlockData(dataConversionHolder);
+    // free data struct as it is no longer needed
+    freeEbcRandomBlockData(inputData);
 
 
 
-    // /*      OUTPUTTING DATA AS EBC FILE     */
 
-    // // get and open the output file in write mode
-    // char *outputFilename = argv[2];
-    // FILE *outputFile = loadOutputFileBinary(outputFilename);
-    // // validate that the file has been opened correctly
-    // if (badFile(outputFile, outputFilename))
-    // { // validate output file
-    //     freeEbcData(outputData);
-    //     return BAD_FILE;
-    // } // validate output file
+    // malloc a struct of type ebcData to store data to
+    ebcData *outputData = mallocEbc();
+    // checking if struct has been malloc'd
+    if (badMalloc(outputData))
+    {
+        freeEbcBlockData(dataConversionHolder);
+        return BAD_MALLOC;
+    }
+
+    // copy over image data and dimensions to the ebcData struct
+    copyEbcBlockDataToEbcData(dataConversionHolder, outputData);
+
+    // set up ebcData for compressed data storage
+    check = setCompressedBinaryImageDataArrayEbc(outputData);
+    if (check != 0)
+    {
+        freeEbcBlockData(dataConversionHolder);
+        freeEbcData(outputData);
+        return check;
+    }
+
+    // compress image data
+    convertEbu2Ebc(outputData->dataBlockUncompressed, outputData->dataBlockCompressed, outputData->numBytesUncompressed);
+
+    // free data struct as it is no longer needed
+    freeEbcBlockData(dataConversionHolder);
+
+
+
+    /*      OUTPUTTING DATA AS EBC FILE     */
+
+    // get and open the output file in write mode
+    char *outputFilename = argv[2];
+    FILE *outputFile = loadOutputFileBinary(outputFilename);
+    // validate that the file has been opened correctly
+    if (badFile(outputFile, outputFilename))
+    { // validate output file
+        freeEbcData(outputData);
+        return BAD_FILE;
+    } // validate output file
 
     
-    // // output to file
-    // errCode = outputFileDataCompressedBinary(outputData, outputFile);
-    // // checking for any error codes
-    // if (errCode != 0)
-    // {
-    //     // exit with the error code and free any data used in the program
-    //     freeEbcData(outputData);
-    //     fclose(outputFile);
-    //     return errCode;
-    // }
+    // output to file
+    errCode = outputFileDataCompressedBinary(outputData, outputFile);
+    // checking for any error codes
+    if (errCode != 0)
+    {
+        // exit with the error code and free any data used in the program
+        freeEbcData(outputData);
+        fclose(outputFile);
+        return errCode;
+    }
 
-
-    // /*      OUTPUTTING BLOCKS IMAGE DATA TO FILE       */
-
-    // // get and open the output file in write mode
-    // char *outputFilename = argv[2];
-    // FILE *outputFile = loadOutputFileBinary(outputFilename);
-    // // validate that the file has been opened correctly
-    // if (badFile(outputFile, outputFilename))
-    // { // validate output file
-    //     freeEbcRandomBlockData(inputData);
-    //     return BAD_FILE;
-    // } // validate output file
-
-    // // output to file
-    // errCode = outputFileDataCompressedRandomBlockBinary(inputData, outputFile);
-    // // checking for any error codes
-    // if (errCode != 0)
-    // {
-    //     // exit with the error code and free any data used in the program
-    //     freeEbcRandomBlockData(inputData);
-    //     fclose(outputFile);
-    //     return errCode;
-    // }
-
-    // // print final success message, free and return
-    // printf("BLOCKED\n");
-    // freeEbcRandomBlockData(inputData);
-    // fclose(inputFile);
-    // return SUCCESS;
 
     // print final success message, free and return
     printf("UNBLOCKED\n");
-    // freeEbcData(outputData);
-    // fclose(outputFile);
+    freeEbcData(outputData);
+    fclose(outputFile);
     return SUCCESS;
 }

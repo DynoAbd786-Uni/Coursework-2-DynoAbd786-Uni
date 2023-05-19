@@ -16,6 +16,6 @@ block getBlockImage(BYTE **image, block blocks);
 
 void assignRandomBlocksToImage(ebcRandomBlockData *data, ebcBlockData *processData);
 
-void calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *outputData);
+int calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *outputData);
 
 void assignParadigmBlocksToBlockArray(block *blockArray, ebcRandomBlockData *data);

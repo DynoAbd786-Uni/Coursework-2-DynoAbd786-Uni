@@ -55,6 +55,7 @@ int main(int argc, char **argv)
         return BAD_FILE;
     } // check file pointer
 
+    
     // checking if any error codes arise when getting data (0 means success)
     int errCode = getFileDataCompressedBinary(inputData, inputFilename, inputFile);
     if (errCode != 0)
@@ -67,6 +68,7 @@ int main(int argc, char **argv)
 
     fclose(inputFile);
 
+    
 
     /*      CONVERTING IMAGE DATA INTO BLOCKS     */
 
@@ -120,7 +122,7 @@ int main(int argc, char **argv)
         freeEbcRandomBlockData(outputData);
         return check;
     }
-
+    
     
     // calculate image data based on randomisation of blocks
     check = randomiseBlockData(dataConversionHolder, outputData, seedForRandomGenerator);
@@ -136,10 +138,17 @@ int main(int argc, char **argv)
 
     // compress image data and paradigm blocks
     compressDataToGivenBit(outputData->dataBlockUncompressed, outputData->dataBlockCompressed, outputData->numBlocksUncompressed, outputData->numBitsCompressed);
-    convertEbu2Ebc(outputData->uncompressedParadigmBlocks, outputData->compressedParadigmBlocks, outputData->numParadigmBlocksCompressed);
+    convertEbu2Ebc(outputData->uncompressedParadigmBlocks, outputData->compressedParadigmBlocks, outputData->sizeOfParadigmBlockArrayCompressed);
 
     // free block data as this is no longer needed
     freeEbcBlockData(dataConversionHolder);
+
+    for (int i = 0; i < outputData->sizeOfParadigmBlockArrayCompressed; i++)
+    {
+        printf("%i, %u\n", i, outputData->compressedParadigmBlocks[i]);
+    }
+    printf("%li\n", outputData->sizeOfParadigmBlockArrayCompressed);
+    printf("%li\n", outputData->sizeOfParadigmBlockArrayUncompressed);
 
 
 

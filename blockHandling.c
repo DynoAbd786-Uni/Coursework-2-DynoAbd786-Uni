@@ -172,12 +172,6 @@ int calculateNoParadigmBlocks(char *programName)
 // picks random blocks from struct ebcBlockData and stores it to ebcRandomBlockData
 int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *outputData, int seed)
 {
-    // // if the amount of blocks in the image is less than the programs required blocks, print out message
-    // if (dataConversionHolder->numBlocksUncompressed < outputData->numParadigmBlocksUncompressed)
-    // {
-    //     outputData->numParadigmBlocksUncompressed = dataConversionHolder->numBlocksUncompressed;
-    //     printf("Do be advised that running this program may result in a file larger in size than the input file. The program will still run, but for storage reasons you are better off just using the normal .ebc file\n");
-    // }
     // set up an array of indexes to block numbers so that it can be cross referenced for repeated index values
     int *excludedBlockIndexStorage = (int *) malloc(outputData->numBlocksUncompressed * sizeof(int));
 
@@ -268,6 +262,7 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
             {
                 // save block of image data
                 outputData->uncompressedParadigmBlocks[pixelTrackerForParadigmBlocks] = (BYTE) dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum];
+
                 outputData->paradigmBlocksIndex[totalParadigmBlocksSelected] = randomBlock;
                 pixelTrackerForParadigmBlocks++;
             }
@@ -295,7 +290,7 @@ block getBlockImage(BYTE **image, block blocks)
     {
         for (int columnInBlock = 0; columnInBlock < MAX_BLOCK_SIZE; columnInBlock++)
         {
-            if (rowInBlock + 1 < blocks.rowSize && columnInBlock + 1 < blocks.columnSize)
+            if (rowInBlock < blocks.rowSize && columnInBlock < blocks.columnSize)
             {
                 // write the value of the pixel in the image to the respective block position
                 blocks.blockImage[rowInBlock][columnInBlock] = image[blocks.rowNum + rowInBlock][blocks.columnNum + columnInBlock];
@@ -375,10 +370,16 @@ void assignRandomBlocksToImage(ebcRandomBlockData *data, ebcBlockData *processDa
 }
 
 // assigns the paradigm blocks and the dataBlock in ebcRandomData, to output an image to ebcData
-void calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *data)
+int calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *data)
 {
     // malloc an array to store paradigm block data
     block *blockArray = (block *) malloc(sizeof(block) * inputData->numParadigmBlocksUncompressed);
+
+    // check for bad malloc
+    if (badMalloc(blockArray))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
 
     // extract paradigm block data
     assignParadigmBlocksToBlockArray(blockArray, inputData);
@@ -441,6 +442,9 @@ void calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *
             blockNo++;
         }
     }
+
+    free(blockArray);
+    return 0;
 }
 
 // extracts paradigm block data to a block array

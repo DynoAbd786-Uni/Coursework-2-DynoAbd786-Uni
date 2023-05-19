@@ -1,6 +1,8 @@
 #include "fileStructs.h"
 #include "conversionFunctions.h"
 
+#include "stdio.h"
+
 // function coverts 1 pixel value from type ebfData file to binary format.
 // does a bitwise calculation to find the 8 least significant bits from the 4 byte unsigned int type
 // error checking unnecessary since pixel values have already been checked to be within limits
@@ -95,13 +97,13 @@ long convertEbc2Ebu(BYTE *compressedPixelValues, BYTE *uncompressedBinaryArray, 
                 {
                     // write the storageByte to the uncompressed array and increment the array to the next position
                     uncompressedBinaryArray[uncompressedBinaryArrayPostitionTracker] = storageByte;
+                    // printf("%li, %u\n", uncompressedBinaryArrayPostitionTracker, storageByte);
                     uncompressedBinaryArrayPostitionTracker++;
                 }
 
                 // reset all variables for the next byte
                 storageByte = 0;
-                uncompressedBitPostitionTracker = 0;
-                
+                uncompressedBitPostitionTracker = 0;   
             }
         }
     }

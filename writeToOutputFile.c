@@ -367,7 +367,7 @@ int outputFileDataCompressedRandomBlockBinary(ebcRandomBlockData *data, FILE *ou
     }
 
     // output paradigm blocks to file and validate for success (0 means success)
-    int errCode = outputImageDataBinary(data->compressedParadigmBlocks, data->numParadigmBlocksCompressed, outputFile);
+    int errCode = outputImageDataBinary(data->compressedParadigmBlocks, data->sizeOfParadigmBlockArrayCompressed, outputFile);
     if (errCode != 0)
     {
         return errCode;
