@@ -839,8 +839,6 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
     // calculates numParadigmBlocksCompressed 
     // extra bit of logic to account for any overhead in the file
     // if there is a remainder from numParadigmBlocksUncompressed, there is an extra byte that is storing information that needs to be collected
-    
-
     if (fmod(data->numParadigmBlocksUncompressed, COMPRESSION_FACTOR) != 0.0)
     {
         data->numParadigmBlocksCompressed = ((data->numParadigmBlocksUncompressed) * (COMPRESSION_FACTOR)) + 1;
@@ -852,17 +850,15 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
 
     // calculate sizeOfParadigmBlockArrayCompressed
     int remainder = (int) round(fmod(data->sizeOfParadigmBlockArrayUncompressed, 1/compressionFactor) * 10);
-    
+
     if (remainder != 0 && remainder != (int) round(1/compressionFactor * 10))
     {
-        printf("here");
-        data->sizeOfParadigmBlockArrayCompressed = ((data->sizeOfParadigmBlockArrayUncompressed) * (compressionFactor)) + 1;
+        data->sizeOfParadigmBlockArrayCompressed = round((data->sizeOfParadigmBlockArrayUncompressed) * (COMPRESSION_FACTOR)) + 1;
     }
     else
     {
-        data->sizeOfParadigmBlockArrayCompressed = ((data->sizeOfParadigmBlockArrayUncompressed) * (compressionFactor));
+        data->sizeOfParadigmBlockArrayCompressed = round((data->sizeOfParadigmBlockArrayUncompressed) * (COMPRESSION_FACTOR));
     }
-
 
     // malloc data for compressedParadigmBlocks 
     data->compressedParadigmBlocks = (BYTE *) malloc(data->sizeOfParadigmBlockArrayCompressed * sizeof(BYTE));
@@ -888,6 +884,7 @@ int getCompressedParadigmBlocksDataArray(ebcRandomBlockData *data, FILE *inputFi
     
     // read in all the compressed pixel data
     fread(data->compressedParadigmBlocks, sizeof(BYTE), data->sizeOfParadigmBlockArrayCompressed, inputFile);
+    
     
 
     // decompress data to check individual amount of pixels in file

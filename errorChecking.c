@@ -292,7 +292,6 @@ int badByteRead(int count, char *filename)
 // returns 1 if the count does not match the expected numBytes
 int badNumBytes(long count, long numBytesUncompressed, char *filename)
 {
-    printf("%li, %li\n", count, numBytesUncompressed);
     if (count != numBytesUncompressed)
     {
         printf("ERROR: Bad Data (%s)\n", filename);
@@ -328,7 +327,7 @@ int noWhitespaceOrNull(char character)
     int asciiValue = (int) character;
     if (!(asciiValue == 10 || asciiValue == 9 || asciiValue == 32 || asciiValue == 0))
     {
-        printf("ERROR: Miscellaneous (file format is incorrect (no whitespace char where there is meant to be a whitespace char))");
+        printf("ERROR: Miscellaneous (file format is incorrect (no whitespace char where there is meant to be a whitespace char))\n");
         return 1;
     } 
 

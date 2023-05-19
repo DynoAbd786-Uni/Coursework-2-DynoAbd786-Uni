@@ -356,7 +356,7 @@ int outputFileDataCompressedBlockBinary(ebcBlockData *data, FILE *outputFile)
 int outputFileDataCompressedRandomBlockBinary(ebcRandomBlockData *data, FILE *outputFile)
 {
     // define the header that needs to be outputted to the file
-    char stringHeader[2];
+    char stringHeader[3];
     sprintf(stringHeader, "E%i", data->numBitsCompressed);
     unsigned char *header = (unsigned char *) stringHeader;
 

@@ -90,7 +90,8 @@ void calculateBlockData(ebcBlockData *data)
             // calculate average, round, and store to respective block
             averageValueForBlock = (int) round((float) totalPixelValues / (float) pixelCount);
             data->blocksInImage[blockTracker].averageValueOfBlock = averageValueForBlock;
-
+            
+            // get the 3x3 image of the respective block
             data->blocksInImage[blockTracker] = getBlockImage(data->imageDataUncompressed, data->blocksInImage[blockTracker]);
 
             // move to next block
@@ -198,10 +199,12 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
     // repeat until number of blocks selected matches the number of paradigm blocks required, or if the total number of blocks matches the numBlocksUncompressed
     while (totalParadigmBlocksSelected < outputData->numParadigmBlocksUncompressed)
     {
+        // checking if there are no more blocks to store to the uncompressed paradigm block array (since they are all the same or there are less blocks than needed)
         if (noOfExcludedBlocks == dataConversionHolder->numBlocksUncompressed)
         {
             break;
         }
+
         // pick a random block using rand
         randomBlock = rand() % dataConversionHolder->numBlocksUncompressed;
 
@@ -263,6 +266,7 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
                 // save block of image data
                 outputData->uncompressedParadigmBlocks[pixelTrackerForParadigmBlocks] = (BYTE) dataConversionHolder->blocksInImage[randomBlock].blockImage[rowNum][columnNum];
 
+                // save index of the random block for later assignment
                 outputData->paradigmBlocksIndex[totalParadigmBlocksSelected] = randomBlock;
                 pixelTrackerForParadigmBlocks++;
             }
@@ -340,8 +344,9 @@ void assignRandomBlocksToImage(ebcRandomBlockData *data, ebcBlockData *processDa
         // looping through the paradigm blocks
         for (int paradigmBlockNo = 0; paradigmBlockNo < data->numParadigmBlocksUncompressed; paradigmBlockNo++)
         {
-            // calculate the current difference by subtracting the current image block, with each paradigm block
-            currentDifference = processData->blocksInImage[imageBlockNo].totalValueOfBlock - processData->blocksInImage[data->paradigmBlocksIndex[paradigmBlockNo]].totalValueOfBlock;
+            // calculate the current difference by subtracting the current image block average, with each paradigm block
+            // i didnt like the total difference approach as it created really bad looking pictures, so i changed it to average instead
+            currentDifference = processData->blocksInImage[imageBlockNo].averageValueOfBlock - processData->blocksInImage[data->paradigmBlocksIndex[paradigmBlockNo]].averageValueOfBlock;
             
             // if the current difference is exactly 0, set the respective location to the paradigm block 
             if (currentDifference == 0)
@@ -403,7 +408,6 @@ int calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *d
 
             // look up respective block from blockArray
             block paradigmBlock = blockArray[blockIndex];
-
 
             // calculate position of top left pixel in image 
             blockTrackerRow = currentBlockRow * 3;

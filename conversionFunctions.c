@@ -97,7 +97,6 @@ long convertEbc2Ebu(BYTE *compressedPixelValues, BYTE *uncompressedBinaryArray, 
                 {
                     // write the storageByte to the uncompressed array and increment the array to the next position
                     uncompressedBinaryArray[uncompressedBinaryArrayPostitionTracker] = storageByte;
-                    // printf("%li, %u\n", uncompressedBinaryArrayPostitionTracker, storageByte);
                     uncompressedBinaryArrayPostitionTracker++;
                 }
 

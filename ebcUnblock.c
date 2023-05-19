@@ -89,7 +89,6 @@ int main(int argc, char **argv)
 
     
 
-
     /*      OUTPUTTING DATA AS EBC FILE     */
 
     // get and open the output file in write mode
