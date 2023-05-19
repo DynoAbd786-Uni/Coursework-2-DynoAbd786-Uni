@@ -15,3 +15,7 @@ int randomiseBlockData(ebcBlockData *dataConversionHolder, ebcRandomBlockData *o
 block getBlockImage(BYTE **image, block blocks);
 
 void assignRandomBlocksToImage(ebcRandomBlockData *data, ebcBlockData *processData);
+
+void calculateRandomBlockImageData(ebcRandomBlockData *inputData, ebcBlockData *outputData);
+
+void assignParadigmBlocksToBlockArray(block *blockArray, ebcRandomBlockData *data);

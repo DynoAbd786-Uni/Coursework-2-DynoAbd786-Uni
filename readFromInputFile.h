@@ -42,7 +42,10 @@ int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FI
 
 int setEbcBlockData(ebcBlockData *data);
 
-int getCompressedBlockImageDataArray(ebcBlockData *data, FILE *inputFile, char *filename);
+int getCompressedBlockImageDataArray(BYTE *compressedBlockArray, BYTE *uncompressedBlockArray,  long sizeOfCompressedBlockArray, long sizeOfUncompressedBlockArray, int numBitsToDecompressFrom, FILE *inputFile, char *filename);
 
+int getFileDataCompressedRandomBlockBinary(ebcRandomBlockData *inputData, char* filename, int numParadigmBlocksUncompressed, FILE *inputFile);
+
+int getCompressedParadigmBlocksDataArray(ebcRandomBlockData *data, FILE *inputFile, char *filename);
 
 int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks);

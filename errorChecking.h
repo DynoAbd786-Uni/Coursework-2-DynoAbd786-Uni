@@ -15,6 +15,8 @@
 #define MAGIC_NUMBER_EBU 0x7565
 #define MAGIC_NUMBER_EBC 0x6365
 #define MAGIC_NUMBER_EBC_BLOCK 0x4345
+#define MAGIC_NUMBER_EBC_RANDOM_BLOCK_5 0x3545
+#define MAGIC_NUMBER_EBC_RANDOM_BLOCK_7 0x3745
 #define MAX_DIMENSION 262144
 #define MIN_DIMENSION 1
 #define MIN_PIXEL_VALUE 0
@@ -39,6 +41,8 @@ int badMagicNumberEbu(unsigned short *magicNumberValue, char *filename);
 int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename);
 
 int badMagicNumberEbcBlock(unsigned short *magicNumberValue, char *filename);
+
+int badMagicNumberEbcRandomBlock(unsigned short *magicNumberValue, int compresssionBit, char *filename);
 
 // checks dimensions
 int badDimensions(int height, int width, int checkValue, char *filename);

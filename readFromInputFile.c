@@ -492,7 +492,6 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
 
 /*      FOR EBCC FILES      */
 
-
 // executes a series of funcions to gather and check all data from an ebu file
 // returns respected error code to the error that may have occured in the file, 0 if successful
 int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FILE *inputFile)
@@ -532,7 +531,7 @@ int getFileDataCompressedBlockBinary(ebcBlockData *inputData, char* filename, FI
 
     // get image data from the file and store it to the struct 
     // checks for any error codes that may have been returned
-    check = getCompressedBlockImageDataArray(inputData, inputFile, filename);
+    check = getCompressedBlockImageDataArray(inputData->blocksCompressed, inputData->blocksUncompressed, inputData->numBlocksCompressed, inputData->numBlocksUncompressed, MAX_BITS_IN_UNCOMPRESSED_BYTE, inputFile, filename);
     if (check != 0)
     {
         return check;
@@ -642,7 +641,7 @@ int setEbcBlockData(ebcBlockData *data)
 }
 
 // gets image data from an ebcBlock compressed binary file
-int getCompressedBlockImageDataArray(ebcBlockData *data, FILE *inputFile, char *filename)
+int getCompressedBlockImageDataArray(BYTE *compressedBlockArray, BYTE *uncompressedBlockArray,  long sizeOfCompressedBlockArray, long sizeOfUncompressedBlockArray, int numBitsToDecompressFrom, FILE *inputFile, char *filename)
 {
     // checks and cycles to next line (sitting on line with the dimensions currently)
     if (noWhitespaceOrNull(getc(inputFile)))
@@ -651,13 +650,13 @@ int getCompressedBlockImageDataArray(ebcBlockData *data, FILE *inputFile, char *
     }
     
     // read in all the compressed pixel data
-    fread(data->blocksCompressed, sizeof(BYTE), data->numBlocksCompressed, inputFile);
+    fread(compressedBlockArray, sizeof(BYTE), sizeOfCompressedBlockArray, inputFile);
 
     // decompress data to check individual amount of pixels in file
     // not possible in this case to check pixel values, since compressed size has only 2^5 bits
     // therefore has guaranteed range of 0 to 31
     // check if number of decompressed bytes matches the assigned numBytesUncompressed
-    if (badNumBytes(convertEbc2Ebu(data->blocksCompressed, data->blocksUncompressed, data->numBlocksCompressed, data->numBlocksUncompressed), data->numBlocksUncompressed, filename))
+    if (badNumBytes(decompressDataFromGivenBit(compressedBlockArray, uncompressedBlockArray, sizeOfCompressedBlockArray, sizeOfUncompressedBlockArray, numBitsToDecompressFrom), sizeOfUncompressedBlockArray, filename))
     {
         return BAD_DATA;
     } 
@@ -680,22 +679,108 @@ int getCompressedBlockImageDataArray(ebcBlockData *data, FILE *inputFile, char *
 
 /*      FOR EBCC RANDOM BLOCK FILES     */
 
+// executes a series of funcions to gather and check all data from an ebcc random block file
+// returns respected error code to the error that may have occured in the file, 0 if successful
+int getFileDataCompressedRandomBlockBinary(ebcRandomBlockData *inputData, char* filename, int numParadigmBlocksUncompressed, FILE *inputFile)
+{   
+    // calculate compression factor (since compression is either in 7 or 5 bits), to check magic number
+    inputData->numBitsCompressed = (int) ceil(log2(numParadigmBlocksUncompressed));
+
+    // set first 2 characters which should be magic number
+    int errCode = getMagicNumber(inputFile, inputData->magicNumber);
+    // checking for correct file format
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    // checking if the magic number matches the known magic number value
+    // checking against the casted value due to endienness.
+    if (badMagicNumberEbcRandomBlock(getMagicNumberValue(inputData->magicNumber), inputData->numBitsCompressed, filename))
+    { // check magic number
+        return BAD_MAGIC_NUMBER;
+    } // check magic number
+
+
+    // scan for the dimensions
+    // and capture fscanfs return to ensure we got 2 values.
+    int check = getDimensions(&inputData->height, &inputData->width, inputFile);
+    // check if dimensions satisfy requirements
+    if (badDimensions(inputData->height, inputData->width, check, filename))
+    { // check dimensions
+        return BAD_DIM;
+    } // check dimensions
+
+    // set up data array to store pixel values later
+    // checks for any error codes that may have been returned
+    check = setEbcRandomBlockData(inputData, numParadigmBlocksUncompressed);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // // get paradigm blocks from the file and store it to the struct 
+    // // checks for any error codes that may have been returned
+    // check = getCompressedParadigmBlocksDataArray(inputData, inputFile, filename);
+    // if (check != 0)
+    // {
+    //     return check;
+    // }
+
+    // // get image data from the file and store it to the struct 
+    // // checks for any error codes that may have been returned
+    // check = getCompressedBlockImageDataArray(inputData->dataBlockCompressed, inputData->dataBlockUncompressed, inputData->numBlocksCompressed, inputData->numBlocksUncompressed, inputData->numBitsCompressed, inputFile, filename);
+    // if (check != 0)
+    // {
+    //     return check;
+    // }
+
+    // return 0 for success
+    return 0;
+}
+
 // mallocs and sets up data arrays in ebcBlockData
 int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
 {
     // set up no of paradigm blocks
     data->numParadigmBlocksUncompressed = numParadigmBlocks;
 
-    // calculate compression factor (since compression is either in 7 or 5 bits)
-    data->numBitsCompressed = (int) ceil(log2(data->numParadigmBlocksUncompressed));
+    // // calculate compression factor (since compression is either in 7 or 5 bits)
+    // data->numBitsCompressed = (int) ceil(log2(data->numParadigmBlocksUncompressed));
 
-    // in case a program may have greater than 8 bits to compress to, throw error
-    if (tooManyBitsForCompression(data->numBitsCompressed))
-    {
-        return 100;
-    }
+    // // in case a program may have greater than 8 bits to compress to, throw error
+    // if (tooManyBitsForCompression(data->numBitsCompressed))
+    // {
+    //     return 100;
+    // }
 
-    double compressionFactor = (double) data->numBitsCompressed / (double) MAX_BITS_IN_BYTE;
+    // double compressionFactor = (double) data->numBitsCompressed / (double) MAX_BITS_IN_BYTE;
+
+    // // set up blocksUncompressed array
+    // // finding number of blocks across the width of the image
+    // long noBlocksByWidth = data->width / 3;
+
+    // // adding an extra block if the width is not divisible
+    // if (data->width % 3 != 0)
+    // {
+    //     noBlocksByWidth++;
+    // }
+
+    // // finding number of blocks across the height of the image
+    // long noBlocksByHeight = data->height / 3;
+
+    // // adding an extra block if the height is not divisible
+    // if (data->height % 3 != 0)
+    // {
+    //     noBlocksByHeight++;
+    // }
+
+    // // calculating total number of blocks for image
+    // data->numBlocksUncompressed = noBlocksByHeight * noBlocksByWidth;
+
+    // printf("%li\n", data->numBlocksUncompressed);
+
+    
 
     // checks whether the data in dataBlockUncompressed alrady exists. if not, malloc new data
     if (data->dataBlockUncompressed == NULL)
@@ -710,75 +795,121 @@ int setEbcRandomBlockData(ebcRandomBlockData *data, int numParadigmBlocks)
         } // check malloc
     }
 
-    // checks whether the data in uncompressedParadigmBlocks alrady exists. if not, malloc new data
-    if (data->uncompressedParadigmBlocks == NULL)
+    // // set a variable to keep track of paradigm array
+    // data->sizeOfParadigmBlockArrayUncompressed = data->numParadigmBlocksUncompressed * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE;
+
+    // // checks whether the data in uncompressedParadigmBlocks alrady exists. if not, malloc new data
+    // if (data->uncompressedParadigmBlocks == NULL)
+    // {
+    //     // data block malloc'd to set up 2D array for imageDataUncompressed
+    //     data->uncompressedParadigmBlocks = (BYTE *) malloc(data->sizeOfParadigmBlockArrayUncompressed * sizeof(BYTE));
+
+    //     // if malloc is unsuccessful, it will return a null pointer
+    //     if (badMalloc(data->uncompressedParadigmBlocks))
+    //     { // check malloc
+    //         return BAD_MALLOC;
+    //     } // check malloc
+
+    //     // initialise array to 0
+    //     memset(data->uncompressedParadigmBlocks, 0, data->sizeOfParadigmBlockArrayUncompressed * sizeof(BYTE));
+    // }
+
+    // // checks whether the data in paradigmBlocksIndex alrady exists. if not, malloc new data
+    // if (data->paradigmBlocksIndex == NULL)
+    // {
+    //     // data block malloc'd to set up 2D array for imageDataUncompressed
+    //     data->paradigmBlocksIndex = (int *) malloc(data->numParadigmBlocksUncompressed * sizeof(int));
+
+    //     // if malloc is unsuccessful, it will return a null pointer
+    //     if (badMalloc(data->paradigmBlocksIndex))
+    //     { // check malloc
+    //         return BAD_MALLOC;
+    //     } // check malloc
+    // }
+
+    // // set up blocksCompressed array
+    // // calculates numBlocksCompressed 
+    // // extra bit of logic to account for any overhead in the file
+    // // if there is a remainder from numBlocksUncompressed, there is an extra byte that is storing information that needs to be collected
+    // if (fmod(data->numBlocksUncompressed, compressionFactor) != 0.0)
+    // {
+    //     data->numBlocksCompressed = ((data->numBlocksUncompressed) * (compressionFactor)) + 1;
+    // }
+    // else
+    // {
+    //     data->numBlocksCompressed = ((data->numBlocksUncompressed) * (compressionFactor));
+    // }
+
+    // // malloc data for dataBlockCompressed 
+    // data->dataBlockCompressed = (BYTE *) malloc(data->numBlocksCompressed * sizeof(BYTE));
+
+    // // if malloc is unsuccessful, it will return a null pointer
+    // if (badMalloc(data->dataBlockCompressed))
+    // { // check malloc
+    //     return BAD_MALLOC;
+    // } // check malloc
+
+    // // set up compressedParadigmBlocks array
+    // // calculates numParadigmBlocksCompressed 
+    // // extra bit of logic to account for any overhead in the file
+    // // if there is a remainder from numParadigmBlocksUncompressed, there is an extra byte that is storing information that needs to be collected
+    // if (fmod(data->numParadigmBlocksUncompressed, COMPRESSION_FACTOR) != 0.0)
+    // {
+    //     data->numParadigmBlocksCompressed = ((data->numParadigmBlocksUncompressed) * (COMPRESSION_FACTOR)) + 1;
+    // }
+    // else
+    // {
+    //     data->numParadigmBlocksCompressed = ((data->numParadigmBlocksUncompressed) * (COMPRESSION_FACTOR));
+    // }
+
+    // // calculate sizeOfParadigmBlockArrayCompressed
+    // if (fmod(data->sizeOfParadigmBlockArrayUncompressed, compressionFactor) != 0.0)
+    // {
+    //     data->sizeOfParadigmBlockArrayCompressed = ((data->sizeOfParadigmBlockArrayUncompressed) * (compressionFactor)) + 1;
+    // }
+    // else
+    // {
+    //     data->sizeOfParadigmBlockArrayCompressed = ((data->sizeOfParadigmBlockArrayUncompressed) * (compressionFactor));
+    // }
+
+
+    // // malloc data for compressedParadigmBlocks 
+    // data->compressedParadigmBlocks = (BYTE *) malloc(data->sizeOfParadigmBlockArrayCompressed * sizeof(BYTE));
+
+    // // if malloc is unsuccessful, it will return a null pointer
+    // if (badMalloc(data->compressedParadigmBlocks))
+    // { // check malloc
+    //     return BAD_MALLOC;
+    // } // check malloc
+
+    return 0;
+}
+
+
+// gets image data from an ebcBlock compressed binary file
+int getCompressedParadigmBlocksDataArray(ebcRandomBlockData *data, FILE *inputFile, char *filename)
+{
+    // checks and cycles to next line (sitting on line with the dimensions currently)
+    if (noWhitespaceOrNull(getc(inputFile)))
     {
-        // data block malloc'd to set up 2D array for imageDataUncompressed
-        data->uncompressedParadigmBlocks = (BYTE *) malloc(data->numParadigmBlocksUncompressed * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE * sizeof(BYTE));
-
-        // if malloc is unsuccessful, it will return a null pointer
-        if (badMalloc(data->uncompressedParadigmBlocks))
-        { // check malloc
-            return BAD_MALLOC;
-        } // check malloc
+        return MISCELLANEOUS;
     }
+    
+    // read in all the compressed pixel data
+    fread(data->compressedParadigmBlocks, sizeof(BYTE), data->numParadigmBlocksCompressed, inputFile);
 
-    // checks whether the data in paradigmBlocksIndex alrady exists. if not, malloc new data
-    if (data->paradigmBlocksIndex == NULL)
+    // decompress data to check individual amount of pixels in file
+    // not possible in this case to check pixel values, since compressed size has only 2^5 bits
+    // therefore has guaranteed range of 0 to 31
+    // check if number of decompressed bytes matches the assigned numBytesUncompressed
+    if (badNumBytes(convertEbc2Ebu(data->compressedParadigmBlocks, data->uncompressedParadigmBlocks, data->numParadigmBlocksCompressed, data->numParadigmBlocksUncompressed), data->numParadigmBlocksUncompressed, filename))
     {
-        // data block malloc'd to set up 2D array for imageDataUncompressed
-        data->paradigmBlocksIndex = (int *) malloc(data->numParadigmBlocksUncompressed * sizeof(int));
-
-        // if malloc is unsuccessful, it will return a null pointer
-        if (badMalloc(data->paradigmBlocksIndex))
-        { // check malloc
-            return BAD_MALLOC;
-        } // check malloc
-    }
-
-    // set up blocksCompressed array
-    // calculates numBlocksCompressed 
-    // extra bit of logic to account for any overhead in the file
-    // if there is a remainder from numBlocksUncompressed, there is an extra byte that is storing information that needs to be collected
-    if (fmod(data->numBlocksUncompressed, compressionFactor) != 0.0)
-    {
-        data->numBlocksCompressed = ((data->numBlocksUncompressed) * (compressionFactor)) + 1;
-    }
-    else
-    {
-        data->numBlocksCompressed = ((data->numBlocksUncompressed) * (compressionFactor));
-    }
-
-    // malloc data for dataBlockCompressed 
-    data->dataBlockCompressed = (BYTE *) malloc(data->numBlocksCompressed * sizeof(BYTE));
-
-    // if malloc is unsuccessful, it will return a null pointer
-    if (badMalloc(data->dataBlockCompressed))
-    { // check malloc
-        return BAD_MALLOC;
-    } // check malloc
-
-    // set up compressedParadigmBlocks array
-    // calculates numParadigmBlocksCompressed 
-    // extra bit of logic to account for any overhead in the file
-    // if there is a remainder from numParadigmBlocksUncompressed, there is an extra byte that is storing information that needs to be collected
-    if (fmod(data->numParadigmBlocksUncompressed, COMPRESSION_FACTOR) != 0.0)
-    {
-        data->numParadigmBlocksCompressed = ((data->numParadigmBlocksUncompressed) * (COMPRESSION_FACTOR)) + 1;
-    }
-    else
-    {
-        data->numParadigmBlocksCompressed = ((data->numParadigmBlocksUncompressed) * (COMPRESSION_FACTOR));
-    }
-
-    // malloc data for compressedParadigmBlocks 
-    data->compressedParadigmBlocks = (BYTE *) malloc(data->numParadigmBlocksCompressed * MAX_BLOCK_SIZE * MAX_BLOCK_SIZE * sizeof(BYTE));
-
-    // if malloc is unsuccessful, it will return a null pointer
-    if (badMalloc(data->compressedParadigmBlocks))
-    { // check malloc
-        return BAD_MALLOC;
-    } // check malloc
+        return BAD_DATA;
+    } 
+    
+    // // extra bit of code to get rid of the null char so the file indicates EOF
+    // BYTE tmp;
+    // fread(&tmp, sizeof(BYTE), 1, inputFile);
 
     return 0;
 }

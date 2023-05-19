@@ -121,7 +121,7 @@ int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename)
     return 0;
 }
 
-// checking against known ebc magic number
+// checking against known ebcc magic number
 // returns 1 if magic number doesnt match known value
 int badMagicNumberEbcBlock(unsigned short *magicNumberValue, char *filename)
 {
@@ -132,6 +132,35 @@ int badMagicNumberEbcBlock(unsigned short *magicNumberValue, char *filename)
         return 1;
     }
 
+    return 0;
+}
+
+// checking against known ebcc magic number
+// returns 1 if magic number doesnt match known value
+int badMagicNumberEbcRandomBlock(unsigned short *magicNumberValue, int compressionBit, char *filename) 
+{
+    if (compressionBit == 5)
+    {
+        // check magic number
+        if (*magicNumberValue != MAGIC_NUMBER_EBC_RANDOM_BLOCK_5) {
+            printf("ERROR: Bad Magic Number (%s)\n", filename);
+            return 1;
+        }
+    }
+    else if (compressionBit == 7)
+    {
+        // check magic number
+        if (*magicNumberValue != MAGIC_NUMBER_EBC_RANDOM_BLOCK_7) {
+            printf("ERROR: Bad Magic Number (%s)\n", filename);
+            return 1;
+        }
+    }
+    else
+    {
+        printf("ERROR: Bad Magic Number (%s)\n", filename);
+        return 1;
+    }
+        
     return 0;
 }
 

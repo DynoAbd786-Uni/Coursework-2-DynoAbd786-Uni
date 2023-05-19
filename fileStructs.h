@@ -83,6 +83,8 @@ typedef struct
     int width, height;
     int numParadigmBlocksUncompressed;
     int numParadigmBlocksCompressed;
+    long sizeOfParadigmBlockArrayUncompressed;
+    long sizeOfParadigmBlockArrayCompressed;
     int numBitsCompressed;
     long numBlocksUncompressed;         // variables for finding how many bytes 
     long numBlocksCompressed;           // are needed for these arrays

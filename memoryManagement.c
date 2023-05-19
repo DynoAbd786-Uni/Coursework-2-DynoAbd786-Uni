@@ -272,8 +272,6 @@ void copyEbcBlockDataToEbcData(ebcBlockData *inputData, ebcData *outputData)
     outputData->dataBlockUncompressed = inputData->dataBlockUncompressed;
     // dereferencing uncompressed data block so ebcBlockData struct can be freed without a double free error
     inputData->dataBlockUncompressed = NULL;
-
-    
 }
 
 // mallocs an uninitialised struct of type ebcRandomBlockData to store file information to
@@ -346,4 +344,10 @@ void copyEbcBlockDataToEbcRandomBlockData(ebcBlockData *inputData, ebcRandomBloc
     outputData->numBlocksUncompressed = inputData->numBlocksUncompressed;
 }
 
-
+// copies over data from ebcBlockData to ebcData for easier data handling
+void copyEbcRandomBlockDataToEbcBlockData(ebcRandomBlockData *inputData, ebcBlockData *outputData)
+{
+    // copying dimensions
+    outputData->width = inputData->width;
+    outputData->height = inputData->height;
+}

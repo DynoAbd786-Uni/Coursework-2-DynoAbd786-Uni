@@ -43,8 +43,12 @@ void copyEbcDataToEbcBlockData(ebcData *inputData, ebcBlockData *outputData);
 void copyEbcBlockDataToEbcData(ebcBlockData *inputData, ebcData *outputData);
 
 
+/*      EBCC RANDOM RELATED FUNCTIONS       */
+
 ebcRandomBlockData *mallocEbcRandomBlock();
 
 void freeEbcRandomBlockData(ebcRandomBlockData *data);
 
 void copyEbcBlockDataToEbcRandomBlockData(ebcBlockData *inputData, ebcRandomBlockData *outputData);
+
+void copyEbcRandomBlockDataToEbcBlockData(ebcRandomBlockData *inputData, ebcBlockData *outputData);
